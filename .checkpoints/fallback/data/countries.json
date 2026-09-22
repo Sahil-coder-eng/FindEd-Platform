@@ -1,0 +1,58 @@
+{
+  "India": {
+    "currency_code": "INR",
+    "currency_symbol": "₹",
+    "default_exchange_rate_to_inr": 1.0,
+    "flag_emoji": "🇮🇳",
+    "avg_tuition_range": "₹1,00,000 – ₹25,00,000/year",
+    "popular_courses": ["Engineering", "Medicine", "MBA", "Law", "Sciences"]
+  },
+  "United States": {
+    "currency_code": "USD",
+    "currency_symbol": "$",
+    "default_exchange_rate_to_inr": 83.50,
+    "flag_emoji": "🇺🇸",
+    "avg_tuition_range": "$20,000 – $60,000/year",
+    "popular_courses": ["Computer Science", "MBA", "Engineering", "Data Science", "Medicine"]
+  },
+  "Canada": {
+    "currency_code": "CAD",
+    "currency_symbol": "C$",
+    "default_exchange_rate_to_inr": 61.50,
+    "flag_emoji": "🇨🇦",
+    "avg_tuition_range": "C$15,000 – C$45,000/year",
+    "popular_courses": ["Computer Science", "Engineering", "Business", "Healthcare", "Data Analytics"]
+  },
+  "United Kingdom": {
+    "currency_code": "GBP",
+    "currency_symbol": "£",
+    "default_exchange_rate_to_inr": 105.00,
+    "flag_emoji": "🇬🇧",
+    "avg_tuition_range": "£12,000 – £38,000/year",
+    "popular_courses": ["Business", "Engineering", "Law", "Medicine", "Arts"]
+  },
+  "Australia": {
+    "currency_code": "AUD",
+    "currency_symbol": "A$",
+    "default_exchange_rate_to_inr": 55.00,
+    "flag_emoji": "🇦🇺",
+    "avg_tuition_range": "A$20,000 – A$50,000/year",
+    "popular_courses": ["Engineering", "IT", "Business", "Healthcare", "Environmental Science"]
+  },
+  "Germany": {
+    "currency_code": "EUR",
+    "currency_symbol": "€",
+    "default_exchange_rate_to_inr": 91.00,
+    "flag_emoji": "🇩🇪",
+    "avg_tuition_range": "€0 – €20,000/year (public universities often free)",
+    "popular_courses": ["Engineering", "Computer Science", "Automotive", "Research", "Business"]
+  },
+  "Singapore": {
+    "currency_code": "SGD",
+    "currency_symbol": "S$",
+    "default_exchange_rate_to_inr": 62.00,
+    "flag_emoji": "🇸🇬",
+    "avg_tuition_range": "S$15,000 – S$50,000/year",
+    "popular_courses": ["Business", "Engineering", "Finance", "Computer Science", "Biotechnology"]
+  }
+}
