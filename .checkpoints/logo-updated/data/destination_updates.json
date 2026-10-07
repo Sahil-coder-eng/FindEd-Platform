@@ -1,0 +1,114 @@
+{
+  "_disclaimer": "SAMPLE DATA FOR PROTOTYPE DEMONSTRATION. These entries are illustrative and based on publicly known policy patterns. Always verify from official sources before making decisions.",
+  "_last_updated": "2026-09-15",
+  "updates": [
+    {
+      "headline": "Canada Extends Post-Graduation Work Permit Eligibility",
+      "date": "2026-08-20",
+      "country": "Canada",
+      "category": "Visa / Immigration",
+      "explanation": "Immigration, Refugees and Citizenship Canada (IRCC) announced extended PGWP eligibility for graduates from designated learning institutions in select fields including STEM and healthcare.",
+      "source_name": "IRCC Official",
+      "source_url": "https://www.canada.ca/en/immigration-refugees-citizenship.html"
+    },
+    {
+      "headline": "Updated Student Direct Stream Processing Times",
+      "date": "2026-07-15",
+      "country": "Canada",
+      "category": "Visa / Immigration",
+      "explanation": "Processing times for Student Direct Stream (SDS) applications from India have been updated. Students are advised to check current processing times before applying.",
+      "source_name": "IRCC Official",
+      "source_url": "https://www.canada.ca/en/immigration-refugees-citizenship/services/study-canada.html"
+    },
+    {
+      "headline": "Ontario Universities Announce Tuition Framework for International Students",
+      "date": "2026-06-10",
+      "country": "Canada",
+      "category": "Education",
+      "explanation": "The Ontario provincial government has released updated tuition fee guidelines for international students for the upcoming academic year.",
+      "source_name": "Ontario Ministry of Education",
+      "source_url": "https://www.ontario.ca/page/ministry-colleges-universities"
+    },
+    {
+      "headline": "US STEM OPT Extension Remains Available for Eligible Graduates",
+      "date": "2026-08-01",
+      "country": "United States",
+      "category": "Student Work",
+      "explanation": "International STEM graduates from accredited US institutions continue to be eligible for a 24-month OPT extension, totaling 36 months of work authorization post-graduation.",
+      "source_name": "USCIS",
+      "source_url": "https://www.uscis.gov/working-in-the-united-states/students-and-exchange-visitors/optional-practical-training-opt-for-f-1-students"
+    },
+    {
+      "headline": "FAFSA Simplification Act: Impact on International Students",
+      "date": "2026-07-01",
+      "country": "United States",
+      "category": "Education",
+      "explanation": "While FAFSA primarily serves domestic students, the simplification has prompted some universities to revise their financial aid processes for international students.",
+      "source_name": "Federal Student Aid",
+      "source_url": "https://studentaid.gov/"
+    },
+    {
+      "headline": "US Consulates in India Expand Student Visa Interview Slots",
+      "date": "2026-06-15",
+      "country": "United States",
+      "category": "Visa / Immigration",
+      "explanation": "The US Embassy in India has added additional visa interview slots for student applicants during the peak admission season to reduce wait times.",
+      "source_name": "US Embassy India",
+      "source_url": "https://www.usembassy.gov/"
+    },
+    {
+      "headline": "UK Graduate Route Visa Continues for 2-Year Post-Study Work",
+      "date": "2026-08-10",
+      "country": "United Kingdom",
+      "category": "Visa / Immigration",
+      "explanation": "The UK Graduate Route continues to offer international students a 2-year post-study work visa (3 years for doctoral graduates) upon completing a qualifying course.",
+      "source_name": "UK Government",
+      "source_url": "https://www.gov.uk/graduate-visa"
+    },
+    {
+      "headline": "UK Universities Offer More Scholarships for Indian Students",
+      "date": "2026-07-20",
+      "country": "United Kingdom",
+      "category": "Education",
+      "explanation": "Several Russell Group universities have announced expanded scholarship programs targeting Indian students for postgraduate programs in STEM and business.",
+      "source_name": "British Council India",
+      "source_url": "https://www.britishcouncil.in/"
+    },
+    {
+      "headline": "Australia Introduces New Student Visa Compliance Framework",
+      "date": "2026-08-05",
+      "country": "Australia",
+      "category": "Visa / Immigration",
+      "explanation": "The Australian Department of Home Affairs has updated compliance requirements for international student visas, emphasizing genuine temporary entrant criteria.",
+      "source_name": "Australian Government",
+      "source_url": "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/student-500"
+    },
+    {
+      "headline": "Australia Increases Post-Study Work Rights for Select Degrees",
+      "date": "2026-07-01",
+      "country": "Australia",
+      "category": "Student Work",
+      "explanation": "Graduates from select degree programs in areas of national priority may now be eligible for extended post-study work rights of up to 4 years.",
+      "source_name": "Australian Government",
+      "source_url": "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/temporary-graduate-485"
+    },
+    {
+      "headline": "Germany Maintains Low/No Tuition at Public Universities",
+      "date": "2026-06-01",
+      "country": "Germany",
+      "category": "Education",
+      "explanation": "Most German public universities continue to offer tuition-free or very low-cost education for international students, though semester fees (€150–€350) still apply.",
+      "source_name": "DAAD",
+      "source_url": "https://www.daad.de/en/"
+    },
+    {
+      "headline": "Singapore Expands Tech.Pass for International Graduates",
+      "date": "2026-07-10",
+      "country": "Singapore",
+      "category": "Student Work",
+      "explanation": "Singapore's Ministry of Manpower has expanded the Tech.Pass program, which may benefit international graduates from Singaporean universities with expertise in tech fields.",
+      "source_name": "Ministry of Manpower Singapore",
+      "source_url": "https://www.mom.gov.sg/"
+    }
+  ]
+}

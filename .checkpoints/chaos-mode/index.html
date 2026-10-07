@@ -1,0 +1,1677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find Ed — Education Loan Comparison Platform</title>
+    <meta name="description" content="A transparent education-financing decision-support system that helps students and parents compare education loans with clarity.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>">
+    <style>
+    /* ── Apple Design System ─────────────────────────────────────── */
+    :root {
+        --primary: #0066cc;
+        --primary-focus: #0071e3;
+        --primary-on-dark: #2997ff;
+        --ink: #1d1d1f;
+        --body-muted: #cccccc;
+        --ink-muted-48: #7a7a7a;
+        --hairline: #e0e0e0;
+        --canvas: #ffffff;
+        --canvas-parchment: #f5f5f7;
+        --surface-pearl: #fafafc;
+        --surface-tile-1: #272729;
+        --surface-black: #000000;
+        --on-primary: #ffffff;
+        --sidebar-bg: linear-gradient(180deg, #0a0a0f 0%, #111118 100%);
+        --sidebar-width: 300px;
+        --transition: 0.18s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+        font-family: "SF Pro Text", "SF Pro Display", system-ui, -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
+        background: var(--canvas);
+        color: var(--ink);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        display: flex;
+        min-height: 100vh;
+    }
+
+    /* ── Sidebar ─────────────────────────────────────────────────── */
+    .sidebar {
+        position: fixed;
+        left: 0; top: 0; bottom: 0;
+        width: var(--sidebar-width);
+        background: var(--sidebar-bg);
+        border-right: 1px solid rgba(255,255,255,0.06);
+        overflow-y: auto;
+        z-index: 100;
+        display: flex;
+        flex-direction: column;
+    }
+    .sidebar-logo {
+        padding: 28px 20px 22px 20px;
+        border-bottom: 1px solid rgba(255,255,255,0.08);
+        margin-bottom: 16px;
+        display: flex;
+        align-items: flex-start;
+        gap: 14px;
+    }
+    .sidebar-logo-icon {
+        width: 48px; height: 48px;
+        background: linear-gradient(135deg, #1a6fff 0%, #0a3fd4 100%);
+        border-radius: 14px;
+        display: flex; align-items: center; justify-content: center;
+        box-shadow: 0 4px 16px rgba(26,111,255,0.45);
+        flex-shrink: 0;
+    }
+    .sidebar-logo-text h2 {
+        font-family: "SF Pro Display", system-ui, -apple-system, "Inter", sans-serif;
+        font-size: 24px; font-weight: 700; letter-spacing: -0.5px;
+        color: #ffffff; margin: 0 0 4px 0; line-height: 1;
+    }
+    .sidebar-logo-text p {
+        font-size: 12px; font-weight: 400; letter-spacing: -0.1px;
+        color: #9da3b4; margin: 0; line-height: 1.35;
+    }
+    .sidebar-nav-label {
+        font-size: 11px; font-weight: 700; letter-spacing: 0.9px;
+        color: #5a5a70; text-transform: uppercase;
+        padding: 10px 20px 6px 20px; margin-top: 6px;
+    }
+    .sidebar-nav { display: flex; flex-direction: column; gap: 4px; padding: 0 10px; }
+    .nav-item {
+        font-size: 16px; font-weight: 500; letter-spacing: -0.2px;
+        color: #b0b0c2; padding: 12px 16px; border-radius: 12px;
+        cursor: pointer; transition: all 0.16s ease;
+        border: 1px solid transparent; display: flex; align-items: center; gap: 10px;
+        user-select: none; text-decoration: none;
+    }
+    .nav-item:hover {
+        background: rgba(255,255,255,0.08); color: #ffffff;
+        transform: translateX(3px);
+    }
+    .nav-item.active {
+        background: rgba(41, 151, 255, 0.18); color: #ffffff;
+        font-weight: 600; border: 1px solid rgba(56, 189, 248, 0.3);
+        box-shadow: 0 2px 12px rgba(41, 151, 255, 0.15);
+    }
+    .sidebar-disclaimer {
+        margin: auto 20px 20px 20px; padding: 14px 16px;
+        background: rgba(255,255,255,0.04);
+        border: 1px solid rgba(255,255,255,0.08); border-radius: 10px;
+        font-size: 11px; letter-spacing: 0.1px; color: #5a5a6e; line-height: 1.6;
+    }
+
+    /* ── Main Content ────────────────────────────────────────────── */
+    .main {
+        margin-left: var(--sidebar-width);
+        flex: 1; padding: 48px;
+        max-width: calc(1100px + 96px);
+    }
+
+    /* ── Typography ──────────────────────────────────────────────── */
+    .hero-title {
+        font-family: "SF Pro Display", system-ui, -apple-system, "Inter", sans-serif;
+        font-size: 40px; font-weight: 600; line-height: 1.10;
+        letter-spacing: 0px; color: var(--ink); margin: 0 0 16px 0;
+    }
+    .hero-subtitle {
+        font-size: 21px; font-weight: 400; line-height: 1.47;
+        letter-spacing: -0.374px; color: var(--ink-muted-48);
+        max-width: 700px; margin-bottom: 32px;
+    }
+    .section-header {
+        font-family: "SF Pro Display", system-ui, -apple-system, "Inter", sans-serif;
+        font-size: 21px; font-weight: 600; line-height: 1.19;
+        letter-spacing: 0.231px; color: var(--ink);
+        margin: 48px 0 16px 0; padding-bottom: 12px;
+        border-bottom: 1px solid var(--hairline);
+    }
+    h3 { font-family: "SF Pro Display", system-ui, -apple-system, "Inter", sans-serif;
+         font-size: 21px; font-weight: 600; letter-spacing: 0.231px; color: var(--ink); margin: 16px 0 8px; }
+    p, li { font-size: 17px; line-height: 1.47; letter-spacing: -0.374px; color: var(--ink); }
+    a { color: var(--primary); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* ── Layout helpers ──────────────────────────────────────────── */
+    .grid { display: grid; gap: 16px; }
+    .grid-2 { grid-template-columns: 1fr 1fr; }
+    .grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+    .grid-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+    .grid-2-1 { grid-template-columns: 2fr 1fr; }
+
+    /* ── Metric Card ─────────────────────────────────────────────── */
+    .metric-card {
+        background: var(--canvas); border: 1px solid var(--hairline);
+        border-radius: 18px; padding: 24px; text-align: left;
+    }
+    .metric-card.accent { border: 2px solid var(--primary); }
+    .metric-label {
+        font-size: 14px; font-weight: 400; letter-spacing: -0.224px;
+        color: var(--ink-muted-48); margin-bottom: 4px;
+    }
+    .metric-value {
+        font-family: "SF Pro Display", system-ui, -apple-system, "Inter", sans-serif;
+        font-size: 34px; font-weight: 600; line-height: 1.47;
+        letter-spacing: -0.374px; color: var(--ink);
+    }
+    .metric-value.blue { color: var(--primary); }
+    .metric-delta { font-size: 14px; color: #ff3b30; margin-top: 2px; }
+    .metric-delta.positive { color: #34c759; }
+
+    /* ── Feature Card ────────────────────────────────────────────── */
+    .feature-card {
+        background: var(--canvas); border: 1px solid var(--hairline);
+        border-radius: 18px; padding: 24px;
+        transition: transform var(--transition);
+    }
+    .feature-card:hover { transform: scale(0.99); }
+    .feature-card .icon { font-size: 1.3rem; margin-bottom: 8px; }
+    .feature-card h4 {
+        font-size: 17px; font-weight: 600; letter-spacing: -0.374px;
+        color: var(--ink); margin: 0 0 6px 0;
+    }
+    .feature-card p { font-size: 14px; color: var(--ink-muted-48); letter-spacing: -0.224px; margin: 0; }
+
+    /* ── Insight Card ────────────────────────────────────────────── */
+    .insight-card {
+        background: var(--canvas-parchment); border-radius: 18px;
+        padding: 20px 24px; margin: 16px 0;
+    }
+    .insight-card h4 {
+        font-family: "SF Pro Display", system-ui; font-size: 21px;
+        font-weight: 600; letter-spacing: 0.231px; color: var(--ink); margin: 0 0 6px;
+    }
+    .insight-card p { font-size: 17px; color: var(--ink-muted-48); margin: 0; }
+
+    /* ── Country Card ────────────────────────────────────────────── */
+    .country-card {
+        background: var(--surface-tile-1); border-radius: 0;
+        padding: 48px; margin: 24px 0; color: #fff;
+    }
+    .country-card .flag { font-size: 2.5rem; line-height: 1; }
+    .country-card h3 {
+        font-size: 40px; font-weight: 600; line-height: 1.10;
+        color: #fff; margin: 8px 0 4px;
+    }
+    .country-card p { color: var(--body-muted); margin: 0; }
+    .country-card .courses { margin-top: 6px; font-size: 14px; letter-spacing: -0.224px; color: var(--ink-muted-48); }
+
+    /* ── Destination Update Card ──────────────────────────────────── */
+    .dest-card {
+        background: linear-gradient(145deg, #1e2533 0%, #131722 100%);
+        border-radius: 14px; padding: 22px 24px; margin-bottom: 16px;
+        box-shadow: 0 4px 18px rgba(0,0,0,0.22);
+    }
+    .dest-card h4 { color: #fff; font-size: 19px; font-weight: 700; line-height: 1.35; letter-spacing: -0.2px; margin: 0 0 10px; }
+    .dest-card p { color: #e2e8f0; font-size: 15px; line-height: 1.6; letter-spacing: -0.1px; margin: 0 0 12px; }
+    .dest-card .meta { color: #94a3b8; font-size: 13px; }
+    .dest-card .link { color: #38bdf8; font-size: 13.5px; font-weight: 600; text-decoration: none; }
+    .dest-card .link:hover { text-decoration: underline; }
+    .dest-card .badge {
+        display: inline-block; background: rgba(0,102,204,0.2);
+        color: #60a5fa; font-size: 12px; font-weight: 600;
+        padding: 3px 10px; border-radius: 9999px; margin-right: 8px;
+    }
+
+    /* ── Disclaimer ──────────────────────────────────────────────── */
+    .disclaimer {
+        background: var(--canvas-parchment); border-radius: 11px;
+        padding: 14px 18px; font-size: 12px; color: var(--ink-muted-48);
+        line-height: 1.5; margin: 16px 0;
+    }
+    .info-box {
+        background: var(--canvas-parchment); border-left: 3px solid var(--primary);
+        border-radius: 0 8px 8px 0; padding: 14px 18px; margin: 16px 0;
+        font-size: 15px; color: var(--ink); line-height: 1.5;
+    }
+    .warning-box {
+        background: var(--canvas-parchment); border-left: 3px solid #ff6b00;
+        border-radius: 0 8px 8px 0; padding: 14px 18px; margin: 16px 0;
+        font-size: 15px; color: var(--ink); line-height: 1.5;
+    }
+
+    /* ── Form Controls ───────────────────────────────────────────── */
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group label {
+        font-size: 14px; font-weight: 500; letter-spacing: -0.224px; color: var(--ink);
+    }
+    .form-group input, .form-group select {
+        border: 1px solid var(--hairline); border-radius: 8px;
+        padding: 10px 14px; font-size: 17px; letter-spacing: -0.374px;
+        color: var(--ink); background: var(--canvas);
+        font-family: inherit; transition: border-color 0.2s, box-shadow 0.2s;
+        width: 100%;
+    }
+    .form-group input:focus, .form-group select:focus {
+        border-color: var(--primary); outline: none;
+        box-shadow: 0 0 0 2px rgba(0,102,204,0.15);
+    }
+
+    /* ── Buttons ──────────────────────────────────────────────────── */
+    .btn {
+        font-family: inherit; font-size: 17px; font-weight: 400;
+        letter-spacing: -0.374px; color: var(--on-primary);
+        background: var(--primary); border: none;
+        border-radius: 9999px; padding: 11px 22px;
+        cursor: pointer; transition: transform 0.12s ease;
+    }
+    .btn:active { transform: scale(0.95); }
+    .btn:focus { outline: 2px solid var(--primary-focus); outline-offset: 2px; }
+
+    /* ── Tabs ─────────────────────────────────────────────────────── */
+    .tab-bar {
+        display: flex; gap: 4px; background: var(--canvas-parchment);
+        border-radius: 9999px; padding: 4px; margin-bottom: 24px;
+        flex-wrap: wrap;
+    }
+    .tab-btn {
+        border-radius: 9999px; font-size: 14px; font-weight: 400;
+        letter-spacing: -0.224px; color: var(--ink); padding: 8px 16px;
+        border: none; background: transparent; cursor: pointer;
+        font-family: inherit; transition: all 0.2s;
+        white-space: nowrap;
+    }
+    .tab-btn.active {
+        background: var(--canvas); color: var(--primary);
+        font-weight: 600; box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ── Table ────────────────────────────────────────────────────── */
+    .data-table {
+        width: 100%; border-collapse: collapse;
+        border: 1px solid var(--hairline); border-radius: 11px;
+        overflow: hidden; margin: 16px 0;
+    }
+    .data-table th {
+        background: var(--canvas-parchment); font-size: 13px;
+        font-weight: 600; letter-spacing: 0.1px; color: var(--ink-muted-48);
+        text-transform: uppercase; padding: 12px 16px; text-align: left;
+        border-bottom: 1px solid var(--hairline);
+    }
+    .data-table td {
+        padding: 12px 16px; font-size: 15px; color: var(--ink);
+        border-bottom: 1px solid var(--canvas-parchment);
+    }
+    .data-table tr:last-child td { border-bottom: none; }
+    .data-table tr:hover td { background: rgba(0,102,204,0.03); }
+
+    /* ── Lender Card ─────────────────────────────────────────────── */
+    .lender-card {
+        background: var(--canvas); border: 1px solid var(--hairline);
+        border-radius: 18px; padding: 24px; margin-bottom: 16px;
+    }
+    .lender-card h4 { font-size: 17px; font-weight: 600; color: var(--ink); margin: 0 0 12px; }
+    .lender-card .detail-row {
+        display: flex; justify-content: space-between;
+        padding: 6px 0; border-bottom: 1px solid var(--canvas-parchment);
+        font-size: 14px;
+    }
+    .lender-card .detail-row:last-child { border-bottom: none; }
+    .lender-card .detail-label { color: var(--ink-muted-48); }
+    .lender-card .detail-value { font-weight: 600; color: var(--ink); }
+    .lender-card .source-badge {
+        display: inline-block; margin-top: 12px;
+        font-size: 12px; color: var(--primary); letter-spacing: -0.1px;
+    }
+
+    /* ── Expander ─────────────────────────────────────────────────── */
+    .expander {
+        border: 1px solid var(--hairline); border-radius: 11px;
+        background: var(--surface-pearl); margin: 16px 0; overflow: hidden;
+    }
+    .expander-header {
+        padding: 14px 18px; cursor: pointer; font-size: 15px;
+        font-weight: 600; color: var(--ink); display: flex;
+        justify-content: space-between; align-items: center;
+        user-select: none;
+    }
+    .expander-header::after { content: "▸"; transition: transform 0.2s; }
+    .expander.open .expander-header::after { transform: rotate(90deg); }
+    .expander-body { display: none; padding: 0 18px 18px; }
+    .expander.open .expander-body { display: block; }
+
+    /* ── Radio group ──────────────────────────────────────────────── */
+    .radio-group { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0 16px; }
+    .radio-group label {
+        font-size: 14px; padding: 8px 16px;
+        border: 1px solid var(--hairline); border-radius: 9999px;
+        cursor: pointer; transition: all 0.16s;
+        color: var(--ink); background: var(--canvas);
+    }
+    .radio-group input { display: none; }
+    .radio-group input:checked + label {
+        background: var(--primary); color: var(--on-primary);
+        border-color: var(--primary);
+    }
+
+    /* ── Slider ───────────────────────────────────────────────────── */
+    input[type="range"] {
+        -webkit-appearance: none; width: 100%; height: 6px;
+        border-radius: 3px; background: var(--hairline); outline: none;
+        margin: 12px 0;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none; width: 22px; height: 22px;
+        border-radius: 50%; background: var(--primary);
+        cursor: pointer; border: 3px solid var(--canvas);
+        box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    }
+
+    /* ── Scrollbar ────────────────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 3px; }
+
+    /* ── Caption ──────────────────────────────────────────────────── */
+    .caption { font-size: 12px; color: var(--ink-muted-48); letter-spacing: -0.12px; margin: 8px 0; font-style: italic; }
+
+    /* ── Spacer ───────────────────────────────────────────────────── */
+    .spacer { height: 24px; }
+
+    /* ── Chart container ──────────────────────────────────────────── */
+    .chart-container { margin: 16px 0; }
+
+    /* ── About page ──────────────────────────────────────────────── */
+    .about-table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+    .about-table th, .about-table td { padding: 10px 16px; text-align: left; border-bottom: 1px solid var(--hairline); font-size: 15px; }
+    .about-table th { font-weight: 600; background: var(--canvas-parchment); }
+
+    /* ── Responsive ──────────────────────────────────────────────── */
+    @media (max-width: 1024px) {
+        .sidebar { width: 260px; }
+        .main { margin-left: 260px; padding: 32px; }
+        .grid-4 { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 768px) {
+        .sidebar { transform: translateX(-100%); transition: transform 0.3s; position: fixed; width: 280px; }
+        .sidebar.open { transform: translateX(0); }
+        .main { margin-left: 0; padding: 20px; }
+        .grid-2, .grid-3, .grid-4, .grid-2-1 { grid-template-columns: 1fr; }
+        .hero-title { font-size: 28px; }
+        .mobile-toggle { display: block !important; }
+    }
+    .mobile-toggle {
+        display: none; position: fixed; top: 16px; left: 16px;
+        z-index: 200; background: var(--primary); color: #fff;
+        border: none; border-radius: 12px; padding: 10px 14px;
+        font-size: 18px; cursor: pointer;
+    }
+
+    /* ── Page transitions ────────────────────────────────────────── */
+    .page { display: none; animation: fadeIn 0.3s ease; }
+    .page.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* ── Multiselect / Tag ────────────────────────────────────────── */
+    .tag {
+        display: inline-block; background: var(--primary);
+        color: #fff; font-size: 13px; font-weight: 500;
+        padding: 4px 12px; border-radius: 9999px; margin: 2px 4px 2px 0;
+    }
+    .tag .remove { cursor: pointer; margin-left: 6px; opacity: 0.7; }
+    .tag .remove:hover { opacity: 1; }
+
+    hr { border: none; border-top: 1px solid var(--hairline); margin: 32px 0; }
+
+    /* ── Loading ──────────────────────────────────────────────────── */
+    .loading { text-align: center; padding: 60px; color: var(--ink-muted-48); font-size: 17px; }
+    </style>
+</head>
+<body>
+
+<!-- Mobile toggle -->
+<button class="mobile-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+
+<!-- Sidebar -->
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+        <div class="sidebar-logo-icon">
+            <svg width="28" height="28" viewBox="0 0 26 26" fill="none">
+                <path d="M13 5L2 10.5L13 16L24 10.5L13 5Z" fill="white" opacity="0.95"/>
+                <path d="M7 13v5c0 2 2.686 4 6 4s6-2 6-4v-5L13 16 7 13Z" fill="white" opacity="0.7"/>
+                <line x1="22" y1="10.5" x2="22" y2="17" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+                <circle cx="22" cy="17.5" r="1.5" fill="white" opacity="0.8"/>
+            </svg>
+        </div>
+        <div class="sidebar-logo-text">
+            <h2>Find Ed</h2>
+            <p>Your education Journey, funded from A to Z</p>
+        </div>
+    </div>
+    <div class="sidebar-nav-label">Navigation</div>
+    <nav class="sidebar-nav" id="nav">
+        <div class="nav-item active" data-page="home">🏠 Home</div>
+        <div class="nav-item" data-page="cost-estimator">💰 Education Cost Estimator</div>
+        <div class="nav-item" data-page="loan-comparison">🏦 Loan Comparison</div>
+        <div class="nav-item" data-page="detailed-analysis">📊 Detailed Analysis</div>
+        <div class="nav-item" data-page="scenario-simulator">🔄 Scenario Simulator</div>
+        <div class="nav-item" data-page="sensitivity">📈 Sensitivity Analysis</div>
+        <div class="nav-item" data-page="international">🌍 International Education</div>
+        <div class="nav-item" data-page="destination-updates">📰 Destination Updates</div>
+        <div class="nav-item" data-page="about">ℹ️ About & Sources</div>
+    </nav>
+    <div class="sidebar-disclaimer">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style="margin-right:5px;vertical-align:middle;">
+            <circle cx="6" cy="6" r="5" stroke="#5a5a6e" stroke-width="1.2"/>
+            <path d="M6 5v4M6 3.5v.5" stroke="#5a5a6e" stroke-width="1.2" stroke-linecap="round"/>
+        </svg>
+        Manually curated dataset from public sources. Always verify with the lender.
+    </div>
+</aside>
+
+<!-- Main Content -->
+<main class="main" id="main">
+
+<!-- ═══════════════ HOME PAGE ═══════════════ -->
+<div class="page active" id="page-home">
+    <p class="hero-title">Compare Education Loans<br/>with Clarity</p>
+    <p class="hero-subtitle">A transparent decision-support platform that helps students and parents understand the true cost of education loans — beyond just the interest rate.</p>
+
+    <div class="spacer"></div>
+    <div class="section-header">Quick EMI Calculator</div>
+
+    <div class="grid grid-3">
+        <div class="form-group">
+            <label for="home-principal">Loan Amount (₹)</label>
+            <input type="number" id="home-principal" value="1000000" min="10000" max="100000000" step="50000">
+        </div>
+        <div class="form-group">
+            <label for="home-rate">Interest Rate (%)</label>
+            <input type="number" id="home-rate" value="9" min="0.1" max="30" step="0.25">
+        </div>
+        <div class="form-group">
+            <label for="home-tenure">Tenure (Years)</label>
+            <input type="number" id="home-tenure" value="10" min="1" max="30" step="1">
+        </div>
+    </div>
+
+    <div class="spacer"></div>
+    <div class="grid grid-4" id="home-metrics"></div>
+
+    <div class="expander" id="home-explainer">
+        <div class="expander-header" onclick="this.parentElement.classList.toggle('open')">How EMI is Calculated</div>
+        <div class="expander-body">
+            <p>EMI (Equated Monthly Instalment) is calculated using the standard reducing-balance formula:</p>
+            <p style="font-family: monospace; background: var(--canvas-parchment); padding: 12px; border-radius: 8px; margin: 12px 0;">
+                EMI = P × r × (1+r)ⁿ / ((1+r)ⁿ − 1)
+            </p>
+            <p>Where <strong>P</strong> = Principal, <strong>r</strong> = Monthly interest rate (annual/12/100), <strong>n</strong> = Total months (years × 12).</p>
+            <p style="margin-top:8px;">Each EMI payment goes partly toward interest and partly toward reducing your principal. In the early months, a larger portion goes to interest; over time, more goes toward principal repayment.</p>
+        </div>
+    </div>
+
+    <div class="spacer"></div>
+    <div class="section-header">What This Platform Offers</div>
+    <div class="grid grid-3" id="home-features"></div>
+</div>
+
+<!-- ═══════════════ EDUCATION COST ESTIMATOR ═══════════════ -->
+<div class="page" id="page-cost-estimator">
+    <p class="hero-title">Education Cost Estimator</p>
+    <p class="hero-subtitle">Estimate your total education expenses and determine how much financing you need.</p>
+    <div class="spacer"></div>
+
+    <div class="grid grid-2-1">
+        <div>
+            <div class="section-header">Annual Expenses</div>
+            <div class="grid grid-2">
+                <div class="form-group"><label>Tuition Fee (₹/year)</label><input type="number" id="ce-tuition" value="200000" min="0" step="10000"></div>
+                <div class="form-group"><label>Living Expenses (₹/year)</label><input type="number" id="ce-living" value="60000" min="0" step="5000"></div>
+                <div class="form-group"><label>Hostel / Accommodation (₹/year)</label><input type="number" id="ce-hostel" value="80000" min="0" step="5000"></div>
+                <div class="form-group"><label>Travel (₹ total)</label><input type="number" id="ce-travel" value="20000" min="0" step="5000"></div>
+                <div class="form-group"><label>Books & Materials (₹/year)</label><input type="number" id="ce-books" value="15000" min="0" step="1000"></div>
+                <div class="form-group"><label>Other Expenses (₹/year)</label><input type="number" id="ce-other" value="10000" min="0" step="1000"></div>
+            </div>
+            <div class="section-header">Course Duration & Funds</div>
+            <div class="grid grid-3">
+                <div class="form-group"><label>Course Duration (years)</label><input type="number" id="ce-years" value="4" min="1" max="7"></div>
+                <div class="form-group"><label>Scholarship (₹ total)</label><input type="number" id="ce-scholarship" value="0" min="0" step="10000"></div>
+                <div class="form-group"><label>Family Contribution (₹)</label><input type="number" id="ce-family" value="200000" min="0" step="10000"></div>
+            </div>
+        </div>
+        <div>
+            <div class="section-header">Summary</div>
+            <div id="ce-summary"></div>
+        </div>
+    </div>
+
+    <div class="spacer"></div>
+    <div class="section-header">Detailed Breakdown</div>
+    <div id="ce-breakdown-table"></div>
+    <div id="ce-next-step"></div>
+</div>
+
+<!-- ═══════════════ LOAN COMPARISON ═══════════════ -->
+<div class="page" id="page-loan-comparison">
+    <p class="hero-title">Loan Comparison</p>
+    <p class="hero-subtitle">Compare education loans across multiple lenders — see how different rates affect your EMI, total interest, and total repayment.</p>
+    <div class="spacer"></div>
+
+    <div class="section-header">Your Loan Requirement</div>
+    <div class="grid grid-2">
+        <div class="form-group"><label>Loan Amount (₹)</label><input type="number" id="lc-amount" value="1000000" min="10000" max="100000000" step="50000"></div>
+        <div class="form-group"><label>Repayment Tenure (Years)</label><input type="number" id="lc-tenure" value="10" min="1" max="30" step="1"></div>
+    </div>
+    <div style="margin: 16px 0;">
+        <label style="font-size:14px; font-weight:500;">Calculate using:</label>
+        <div class="radio-group">
+            <input type="radio" name="lc-rate-type" id="lc-min" value="min" checked><label for="lc-min">Minimum rate</label>
+            <input type="radio" name="lc-rate-type" id="lc-max" value="max"><label for="lc-max">Maximum rate</label>
+            <input type="radio" name="lc-rate-type" id="lc-avg" value="avg"><label for="lc-avg">Average rate</label>
+        </div>
+    </div>
+
+    <div class="section-header">Comparison Results</div>
+    <div id="lc-comparison-table"></div>
+    <div class="chart-container" id="lc-chart"></div>
+
+    <div class="section-header">Lender Details</div>
+    <div class="grid grid-2" id="lc-lender-cards"></div>
+
+    <div class="disclaimer">📋 This comparison is based on a curated dataset. Actual rates depend on your credit profile, collateral, and the lender's current offers. Always verify directly with the lender.</div>
+</div>
+
+<!-- ═══════════════ DETAILED ANALYSIS ═══════════════ -->
+<div class="page" id="page-detailed-analysis">
+    <p class="hero-title">Detailed Analysis</p>
+    <p class="hero-subtitle">Deep dive into EMI breakdown, amortization, moratorium impact, and total cost.</p>
+    <div class="spacer"></div>
+
+    <div class="grid grid-3">
+        <div class="form-group"><label>Loan Amount (₹)</label><input type="number" id="da-principal" value="1000000" min="10000" step="50000"></div>
+        <div class="form-group"><label>Interest Rate (%)</label><input type="number" id="da-rate" value="9" min="0.1" max="30" step="0.25"></div>
+        <div class="form-group"><label>Tenure (Years)</label><input type="number" id="da-tenure" value="10" min="1" max="30" step="1"></div>
+    </div>
+    <div class="spacer"></div>
+
+    <div class="tab-bar" id="da-tabs">
+        <button class="tab-btn active" data-tab="da-emi">📐 EMI Breakdown</button>
+        <button class="tab-btn" data-tab="da-amort">📊 Amortization Schedule</button>
+        <button class="tab-btn" data-tab="da-mora">⏸️ Moratorium Simulator</button>
+        <button class="tab-btn" data-tab="da-total">💰 Total Cost Analysis</button>
+    </div>
+
+    <div class="tab-panel active" id="da-emi">
+        <div class="grid grid-3" id="da-emi-metrics"></div>
+        <div class="chart-container" id="da-emi-chart"></div>
+        <div class="expander">
+            <div class="expander-header" onclick="this.parentElement.classList.toggle('open')">How EMI is Calculated</div>
+            <div class="expander-body">
+                <p>EMI = P × r × (1+r)ⁿ / ((1+r)ⁿ − 1). Each payment splits between interest and principal reduction. Early payments are interest-heavy; later payments are principal-heavy.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-panel" id="da-amort">
+        <div class="grid grid-2">
+            <div class="chart-container" id="da-amort-chart1"></div>
+            <div class="chart-container" id="da-amort-chart2"></div>
+        </div>
+        <div class="section-header">Yearly Summary</div>
+        <div id="da-yearly-table"></div>
+        <div class="expander">
+            <div class="expander-header" onclick="this.parentElement.classList.toggle('open')">📋 View Full Monthly Schedule</div>
+            <div class="expander-body" id="da-monthly-table"></div>
+        </div>
+    </div>
+
+    <div class="tab-panel" id="da-mora">
+        <div class="section-header">Moratorium Configuration</div>
+        <div class="grid grid-3">
+            <div class="form-group"><label>Course Duration (months)</label><input type="number" id="da-mora-course" value="48" min="0" max="84" step="6"></div>
+            <div class="form-group"><label>Grace Period (months)</label><input type="number" id="da-mora-grace" value="6" min="0" max="24" step="3"></div>
+            <div class="form-group">
+                <label>Interest During Moratorium</label>
+                <select id="da-mora-treatment">
+                    <option value="capitalized">Interest Capitalized (added to principal)</option>
+                    <option value="paid_during">Interest Paid Monthly During Moratorium</option>
+                </select>
+            </div>
+        </div>
+        <div class="chart-container" id="da-mora-chart"></div>
+        <div class="section-header">Moratorium Impact</div>
+        <div class="grid grid-3" id="da-mora-metrics"></div>
+        <div id="da-mora-details"></div>
+    </div>
+
+    <div class="tab-panel" id="da-total">
+        <div class="section-header">Total Cost Configuration</div>
+        <div class="grid grid-2">
+            <div class="form-group"><label>Processing Fee (%)</label><input type="number" id="da-proc-fee" value="0" min="0" max="5" step="0.25"></div>
+            <div class="form-group"><label>Documentation Charges (₹)</label><input type="number" id="da-doc-charges" value="0" min="0" step="500"></div>
+        </div>
+        <div class="spacer"></div>
+        <div class="grid grid-3" id="da-total-metrics"></div>
+        <div class="chart-container" id="da-total-chart"></div>
+    </div>
+</div>
+
+<!-- ═══════════════ SCENARIO SIMULATOR ═══════════════ -->
+<div class="page" id="page-scenario-simulator">
+    <p class="hero-title">Scenario Simulator</p>
+    <p class="hero-subtitle">Compare different loan configurations to understand how principal, rate, and tenure affect your repayment.</p>
+    <div class="spacer"></div>
+
+    <div class="form-group" style="max-width:200px;margin-bottom:20px;">
+        <label>Number of Scenarios</label>
+        <input type="range" id="ss-count" min="2" max="4" value="3" oninput="document.getElementById('ss-count-val').textContent=this.value; renderScenarios()">
+        <span id="ss-count-val" style="font-size:14px;color:var(--ink-muted-48);">3</span>
+    </div>
+    <div class="grid grid-3" id="ss-inputs"></div>
+
+    <div class="spacer"></div>
+    <div class="section-header">Comparison Results</div>
+    <div id="ss-table"></div>
+    <div class="chart-container" id="ss-chart"></div>
+    <div id="ss-insight"></div>
+</div>
+
+<!-- ═══════════════ SENSITIVITY ANALYSIS ═══════════════ -->
+<div class="page" id="page-sensitivity">
+    <p class="hero-title">Sensitivity Analysis</p>
+    <p class="hero-subtitle">Visualize how changes in interest rate or tenure affect your loan outcome. This shows numerical tradeoffs, not recommendations.</p>
+    <div class="spacer"></div>
+
+    <div class="grid grid-2">
+        <div class="form-group"><label>Loan Amount (₹)</label><input type="number" id="sa-principal" value="1000000" min="10000" step="50000"></div>
+        <div class="form-group"><label>Base Interest Rate (%)</label><input type="number" id="sa-rate" value="9" min="0.1" max="30" step="0.25"></div>
+    </div>
+    <div class="spacer"></div>
+
+    <div class="tab-bar" id="sa-tabs">
+        <button class="tab-btn active" data-tab="sa-rate">📊 Interest Rate Sensitivity</button>
+        <button class="tab-btn" data-tab="sa-tenure">📅 Tenure Sensitivity</button>
+    </div>
+
+    <div class="tab-panel active" id="sa-rate">
+        <div class="grid grid-3">
+            <div class="form-group"><label>Fixed Tenure (Years)</label><input type="number" id="sa-tenure-fixed" value="10" min="1" max="30"></div>
+            <div class="form-group"><label>Min Rate (%)</label><input type="number" id="sa-rate-min" value="7" step="0.5"></div>
+            <div class="form-group"><label>Max Rate (%)</label><input type="number" id="sa-rate-max" value="14" step="0.5"></div>
+        </div>
+        <div class="chart-container" id="sa-rate-chart"></div>
+        <div id="sa-rate-table"></div>
+    </div>
+
+    <div class="tab-panel" id="sa-tenure">
+        <p style="margin-bottom:12px;">Select tenures to compare:</p>
+        <div id="sa-tenure-options" style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:20px;"></div>
+        <div class="chart-container" id="sa-tenure-chart"></div>
+        <div id="sa-tenure-table"></div>
+        <p class="caption">⚖️ A shorter tenure means higher monthly payments but significantly less total interest. A longer tenure eases monthly burden but costs more overall. This is a personal tradeoff based on your monthly budget.</p>
+    </div>
+</div>
+
+<!-- ═══════════════ INTERNATIONAL EDUCATION ═══════════════ -->
+<div class="page" id="page-international">
+    <p class="hero-title">International Education</p>
+    <p class="hero-subtitle">Plan your international education financing with currency conversion and exchange-rate impact analysis.</p>
+    <div class="spacer"></div>
+
+    <div class="form-group" style="max-width:400px;">
+        <label>🌍 Target Country</label>
+        <select id="intl-country"></select>
+    </div>
+    <div id="intl-country-card"></div>
+
+    <div class="tab-bar" id="intl-tabs">
+        <button class="tab-btn active" data-tab="intl-convert">💱 Currency Converter</button>
+        <button class="tab-btn" data-tab="intl-sensitivity">📊 Exchange Rate Sensitivity</button>
+    </div>
+
+    <div class="tab-panel active" id="intl-convert">
+        <div class="grid grid-2">
+            <div class="form-group"><label id="intl-amount-label">Amount</label><input type="number" id="intl-amount" value="30000" min="0" step="1000"></div>
+            <div class="form-group"><label id="intl-rate-label">Exchange Rate</label><input type="number" id="intl-rate" value="83.5" min="0.01" step="0.5"></div>
+        </div>
+        <div id="intl-result"></div>
+        <div class="disclaimer">💱 Exchange rates are user-editable defaults for illustration. They are not predictions. Always verify current rates from your bank.</div>
+    </div>
+
+    <div class="tab-panel" id="intl-sensitivity">
+        <div class="form-group" style="max-width:300px;">
+            <label>Variation Range (±%): <span id="intl-var-val">10</span>%</label>
+            <input type="range" id="intl-var" min="2" max="25" value="10" oninput="document.getElementById('intl-var-val').textContent=this.value; renderIntlSensitivity()">
+        </div>
+        <div class="chart-container" id="intl-sens-chart"></div>
+        <div id="intl-sens-table"></div>
+        <p class="caption">📊 This chart shows how potential exchange-rate movements could affect the INR cost of your education. These are illustrative scenarios, not predictions of future rates.</p>
+    </div>
+</div>
+
+<!-- ═══════════════ DESTINATION UPDATES ═══════════════ -->
+<div class="page" id="page-destination-updates">
+    <p class="hero-title">Destination Updates</p>
+    <p class="hero-subtitle">Relevant education, visa, and work-permit updates for popular study destinations.</p>
+    <div class="spacer"></div>
+
+    <div class="grid grid-2">
+        <div class="form-group"><label>🌍 Country</label><select id="du-country"><option value="All">All</option></select></div>
+        <div class="form-group"><label>📂 Category</label><select id="du-category"><option value="All">All</option></select></div>
+    </div>
+    <div class="spacer"></div>
+    <div id="du-cards"></div>
+</div>
+
+<!-- ═══════════════ ABOUT & SOURCES ═══════════════ -->
+<div class="page" id="page-about">
+    <p class="hero-title">About This Platform</p>
+
+    <h3>🎯 Purpose</h3>
+    <p>This is a <strong>transparent education-financing decision-support platform</strong> designed to help students and parents understand the true cost of education loans.</p>
+    <p style="margin-top:12px;">We are <strong>not</strong> simply an EMI calculator. This platform brings together:</p>
+    <ul style="margin:12px 0 12px 24px; line-height: 2;">
+        <li>EMI calculation with full mathematical transparency</li>
+        <li>Multi-lender comparison across documented attributes</li>
+        <li>Repayment schedule visualization</li>
+        <li>Moratorium period impact analysis</li>
+        <li>Total cost estimation including applicable charges</li>
+        <li>Scenario and sensitivity analysis</li>
+        <li>International education cost planning</li>
+        <li>Relevant destination updates</li>
+    </ul>
+
+    <h3>🔬 Methodology</h3>
+    <ol style="margin:12px 0 12px 24px; line-height: 2;">
+        <li><strong>Problem Identification</strong> → Evidence from credible sources</li>
+        <li><strong>Literature Review</strong> → Academic papers, existing platforms</li>
+        <li><strong>Research Gap</strong> → What existing solutions don't provide</li>
+        <li><strong>Mathematical Model</strong> → Standard reducing-balance EMI formula</li>
+        <li><strong>System Architecture</strong> → Modular calculation + presentation layers</li>
+        <li><strong>Prototype Development</strong> → Working web application</li>
+        <li><strong>Validation</strong> → Unit tests + cross-validation with known calculators</li>
+    </ol>
+
+    <h3>🎯 SDG Alignment</h3>
+    <ul style="margin:12px 0 12px 24px; line-height: 2;">
+        <li><strong>SDG 4 — Quality Education</strong>: Supporting informed access to education financing for higher/tertiary education.</li>
+        <li><strong>SDG 10 — Reduced Inequalities</strong>: Improving access to understandable financial information for education planning.</li>
+    </ul>
+
+    <div class="section-header">Data Sources</div>
+    <div id="about-sources-table"></div>
+
+    <div class="disclaimer">📋 <strong>Data Disclaimer:</strong> This prototype uses a manually curated and dated dataset collected from publicly available official sources. Interest rates, fees, and terms are subject to change. Always verify directly with the lender before making financial decisions. Where information was not available from the source, it is marked as "Not Available" rather than assumed to be zero.</div>
+
+    <h3>🏗️ Technology Stack</h3>
+    <table class="about-table">
+        <tr><th>Component</th><th>Technology</th></tr>
+        <tr><td>Frontend</td><td>HTML / CSS / JavaScript</td></tr>
+        <tr><td>Visualization</td><td>Plotly.js</td></tr>
+        <tr><td>Data</td><td>CSV / JSON (curated dataset)</td></tr>
+        <tr><td>Calculations</td><td>Client-side JavaScript (tested)</td></tr>
+    </table>
+
+    <h3>📈 PML Roadmap</h3>
+    <table class="about-table">
+        <tr><th>Phase</th><th>PML</th><th>Status</th></tr>
+        <tr><td>Problem Research & Architecture</td><td>PML 1–3</td><td>✅ Current</td></tr>
+        <tr><td>Real Data + User Testing</td><td>PML 4–5</td><td>🔜 Planned</td></tr>
+        <tr><td>Live MVP + Partnerships</td><td>PML 6–9</td><td>📋 Future</td></tr>
+    </table>
+
+    <h3>👥 Team</h3>
+    <p>Built by university students as part of a Project Expo competition.</p>
+    <hr>
+    <p class="caption" style="font-style:normal;">This platform is a research prototype. It provides information for educational purposes and is not financial advice.</p>
+</div>
+
+</main>
+
+<script>
+// ══════════════════════════════════════════════════════════════════════
+// DATA
+// ══════════════════════════════════════════════════════════════════════
+const LENDERS = [
+    {lender_name:"SBI Student Loan Scheme",loan_type:"Education - Domestic & Abroad",interest_rate_min:8.15,interest_rate_max:10.00,processing_fee:"Not Available",max_loan_amount:"5000000",moratorium_months:12,course_period_max_months:60,repayment_period_max_years:15,collateral_required:"Above ₹7.5L",interest_during_moratorium:"Simple interest accrues",source_url:"https://sbi.co.in/web/personal-banking/loans/education-loans",last_verified:"2026-09-15",notes:"Collateral required for loans above ₹7.5 lakh. Rate varies by CIBIL score and collateral."},
+    {lender_name:"Bank of Baroda Scholar Loan",loan_type:"Education - Domestic & Abroad",interest_rate_min:8.30,interest_rate_max:9.90,processing_fee:"Not Available",max_loan_amount:"8000000",moratorium_months:6,course_period_max_months:60,repayment_period_max_years:15,collateral_required:"Above ₹4L for domestic",interest_during_moratorium:"Simple interest accrues",source_url:"https://www.bankofbaroda.in/personal-banking/loans/education-loan",last_verified:"2026-09-15",notes:"Processing fee waiver may apply during promotional periods."},
+    {lender_name:"HDFC Credila",loan_type:"Education - Abroad",interest_rate_min:9.00,interest_rate_max:13.25,processing_fee:"1.0% of loan amount",max_loan_amount:"4000000",moratorium_months:6,course_period_max_months:48,repayment_period_max_years:10,collateral_required:"Case by case",interest_during_moratorium:"Simple interest accrues; option to pay during study",source_url:"https://www.hdfccredila.com/",last_verified:"2026-09-15",notes:"NBFC specializing in education loans. Rates vary significantly by profile."},
+    {lender_name:"Axis Bank Education Loan",loan_type:"Education - Domestic & Abroad",interest_rate_min:8.75,interest_rate_max:11.50,processing_fee:"Not Available",max_loan_amount:"7500000",moratorium_months:6,course_period_max_months:60,repayment_period_max_years:15,collateral_required:"Above ₹4L",interest_during_moratorium:"Simple interest accrues",source_url:"https://www.axisbank.com/retail/loans/education-loan",last_verified:"2026-09-15",notes:"Tax benefit available under Section 80E."},
+    {lender_name:"Punjab National Bank Saraswati",loan_type:"Education - Domestic & Abroad",interest_rate_min:8.45,interest_rate_max:10.65,processing_fee:"Not Available",max_loan_amount:"6000000",moratorium_months:12,course_period_max_months:60,repayment_period_max_years:15,collateral_required:"Above ₹7.5L",interest_during_moratorium:"Simple interest accrues",source_url:"https://www.pnbindia.in/education-loan.html",last_verified:"2026-09-15",notes:"Government bank with competitive rates for domestic studies."},
+    {lender_name:"IDBI Bank Education Loan",loan_type:"Education - Abroad",interest_rate_min:8.50,interest_rate_max:10.75,processing_fee:"0.5% of loan amount",max_loan_amount:"3000000",moratorium_months:6,course_period_max_months:48,repayment_period_max_years:12,collateral_required:"Above ₹4L",interest_during_moratorium:"Simple interest accrues",source_url:"https://www.idbibank.in/education-loan.aspx",last_verified:"2026-09-15",notes:"Flexible repayment options available."},
+    {lender_name:"Canara Bank Vidya Turant",loan_type:"Education - Domestic & Abroad",interest_rate_min:8.25,interest_rate_max:11.00,processing_fee:"Not Available",max_loan_amount:"4000000",moratorium_months:12,course_period_max_months:60,repayment_period_max_years:15,collateral_required:"Above ₹7.5L",interest_during_moratorium:"Simple interest accrues",source_url:"https://canarabank.com/english/loans/education-loans/",last_verified:"2026-09-15",notes:"Quick processing for domestic courses."},
+    {lender_name:"Prodigy Finance",loan_type:"Education - Abroad (Select Universities)",interest_rate_min:9.50,interest_rate_max:14.50,processing_fee:"Not Available",max_loan_amount:"Not Available",moratorium_months:6,course_period_max_months:24,repayment_period_max_years:10,collateral_required:"No collateral",interest_during_moratorium:"Interest capitalized during study",source_url:"https://prodigyfinance.com/",last_verified:"2026-09-15",notes:"International lender; no collateral or co-signer required for select universities. Rates are variable."}
+];
+
+const COUNTRIES = {"United States":{currency_code:"USD",currency_symbol:"$",default_exchange_rate_to_inr:83.5,flag_emoji:"🇺🇸",avg_tuition_range:"$20,000 – $60,000/year",popular_courses:["Computer Science","MBA","Engineering","Data Science","Medicine"]},"Canada":{currency_code:"CAD",currency_symbol:"C$",default_exchange_rate_to_inr:61.5,flag_emoji:"🇨🇦",avg_tuition_range:"C$15,000 – C$45,000/year",popular_courses:["Computer Science","Engineering","Business","Healthcare","Data Analytics"]},"United Kingdom":{currency_code:"GBP",currency_symbol:"£",default_exchange_rate_to_inr:105,flag_emoji:"🇬🇧",avg_tuition_range:"£12,000 – £38,000/year",popular_courses:["Business","Engineering","Law","Medicine","Arts"]},"Australia":{currency_code:"AUD",currency_symbol:"A$",default_exchange_rate_to_inr:55,flag_emoji:"🇦🇺",avg_tuition_range:"A$20,000 – A$50,000/year",popular_courses:["Engineering","IT","Business","Healthcare","Environmental Science"]},"Germany":{currency_code:"EUR",currency_symbol:"€",default_exchange_rate_to_inr:91,flag_emoji:"🇩🇪",avg_tuition_range:"€0 – €20,000/year (public universities often free)",popular_courses:["Engineering","Computer Science","Automotive","Research","Business"]},"Singapore":{currency_code:"SGD",currency_symbol:"S$",default_exchange_rate_to_inr:62,flag_emoji:"🇸🇬",avg_tuition_range:"S$15,000 – S$50,000/year",popular_courses:["Business","Engineering","Finance","Computer Science","Biotechnology"]}};
+
+const UPDATES = [
+    {headline:"Canada Extends Post-Graduation Work Permit Eligibility",date:"2026-08-20",country:"Canada",category:"Visa / Immigration",explanation:"Immigration, Refugees and Citizenship Canada (IRCC) announced extended PGWP eligibility for graduates from designated learning institutions in select fields including STEM and healthcare.",source_name:"IRCC Official",source_url:"https://www.canada.ca/en/immigration-refugees-citizenship.html"},
+    {headline:"Updated Student Direct Stream Processing Times",date:"2026-07-15",country:"Canada",category:"Visa / Immigration",explanation:"Processing times for Student Direct Stream (SDS) applications from India have been updated. Students are advised to check current processing times before applying.",source_name:"IRCC Official",source_url:"https://www.canada.ca/en/immigration-refugees-citizenship/services/study-canada.html"},
+    {headline:"Ontario Universities Announce Tuition Framework for International Students",date:"2026-06-10",country:"Canada",category:"Education",explanation:"The Ontario provincial government has released updated tuition fee guidelines for international students for the upcoming academic year.",source_name:"Ontario Ministry of Education",source_url:"https://www.ontario.ca/page/ministry-colleges-universities"},
+    {headline:"US STEM OPT Extension Remains Available for Eligible Graduates",date:"2026-08-01",country:"United States",category:"Student Work",explanation:"International STEM graduates from accredited US institutions continue to be eligible for a 24-month OPT extension, totaling 36 months of work authorization post-graduation.",source_name:"USCIS",source_url:"https://www.uscis.gov/working-in-the-united-states/students-and-exchange-visitors/optional-practical-training-opt-for-f-1-students"},
+    {headline:"FAFSA Simplification Act: Impact on International Students",date:"2026-07-01",country:"United States",category:"Education",explanation:"While FAFSA primarily serves domestic students, the simplification has prompted some universities to revise their financial aid processes for international students.",source_name:"Federal Student Aid",source_url:"https://studentaid.gov/"},
+    {headline:"US Consulates in India Expand Student Visa Interview Slots",date:"2026-06-15",country:"United States",category:"Visa / Immigration",explanation:"The US Embassy in India has added additional visa interview slots for student applicants during the peak admission season to reduce wait times.",source_name:"US Embassy India",source_url:"https://www.usembassy.gov/"},
+    {headline:"UK Graduate Route Visa Continues for 2-Year Post-Study Work",date:"2026-08-10",country:"United Kingdom",category:"Visa / Immigration",explanation:"The UK Graduate Route continues to offer international students a 2-year post-study work visa (3 years for doctoral graduates) upon completing a qualifying course.",source_name:"UK Government",source_url:"https://www.gov.uk/graduate-visa"},
+    {headline:"UK Universities Offer More Scholarships for Indian Students",date:"2026-07-20",country:"United Kingdom",category:"Education",explanation:"Several Russell Group universities have announced expanded scholarship programs targeting Indian students for postgraduate programs in STEM and business.",source_name:"British Council India",source_url:"https://www.britishcouncil.in/"},
+    {headline:"Australia Introduces New Student Visa Compliance Framework",date:"2026-08-05",country:"Australia",category:"Visa / Immigration",explanation:"The Australian Department of Home Affairs has updated compliance requirements for international student visas, emphasizing genuine temporary entrant criteria.",source_name:"Australian Government",source_url:"https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/student-500"},
+    {headline:"Australia Increases Post-Study Work Rights for Select Degrees",date:"2026-07-01",country:"Australia",category:"Student Work",explanation:"Graduates from select degree programs in areas of national priority may now be eligible for extended post-study work rights of up to 4 years.",source_name:"Australian Government",source_url:"https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/temporary-graduate-485"},
+    {headline:"Germany Maintains Low/No Tuition at Public Universities",date:"2026-06-01",country:"Germany",category:"Education",explanation:"Most German public universities continue to offer tuition-free or very low-cost education for international students, though semester fees (€150–€350) still apply.",source_name:"DAAD",source_url:"https://www.daad.de/en/"},
+    {headline:"Singapore Expands Tech.Pass for International Graduates",date:"2026-07-10",country:"Singapore",category:"Student Work",explanation:"Singapore's Ministry of Manpower has expanded the Tech.Pass program, which may benefit international graduates from Singaporean universities with expertise in tech fields.",source_name:"Ministry of Manpower Singapore",source_url:"https://www.mom.gov.sg/"}
+];
+
+// ══════════════════════════════════════════════════════════════════════
+// CALCULATION ENGINE (port of Python)
+// ══════════════════════════════════════════════════════════════════════
+function calculateEMI(principal, annualRate, tenureYears) {
+    const n = tenureYears * 12;
+    if (annualRate === 0) {
+        const emi = principal / n;
+        return { principal, annual_rate:0, tenure_years:tenureYears, tenure_months:n, monthly_rate:0, emi:Math.round(emi*100)/100, total_payment:Math.round(principal*100)/100, total_interest:0, interest_to_principal_ratio:0 };
+    }
+    const r = annualRate / 12 / 100;
+    const power = Math.pow(1+r, n);
+    const emi = principal * r * power / (power - 1);
+    const totalPayment = emi * n;
+    const totalInterest = totalPayment - principal;
+    return { principal, annual_rate:annualRate, tenure_years:tenureYears, tenure_months:n, monthly_rate:r, emi:Math.round(emi*100)/100, total_payment:Math.round(totalPayment*100)/100, total_interest:Math.round(totalInterest*100)/100, interest_to_principal_ratio:Math.round(totalInterest/principal*10000)/10000 };
+}
+
+function generateAmortization(principal, annualRate, tenureYears) {
+    const n = tenureYears * 12;
+    const r = annualRate > 0 ? annualRate/12/100 : 0;
+    const power = r > 0 ? Math.pow(1+r, n) : 1;
+    const emi = r > 0 ? principal * r * power / (power - 1) : principal / n;
+    const schedule = [];
+    let balance = principal;
+    for (let m = 1; m <= n; m++) {
+        const interest = Math.round(balance * r * 100) / 100;
+        let princPart, emiAdj;
+        if (m === n) { princPart = Math.round(balance*100)/100; emiAdj = princPart + interest; }
+        else { princPart = Math.round((emi - interest)*100)/100; emiAdj = emi; }
+        let closing = Math.round((balance - princPart)*100)/100;
+        if (closing < 0) closing = 0;
+        schedule.push({ month:m, opening:Math.round(balance*100)/100, emi:Math.round(emiAdj*100)/100, interest, principal:princPart, closing });
+        balance = closing;
+    }
+    return schedule;
+}
+
+function getYearlySummary(schedule) {
+    const yearly = {};
+    schedule.forEach(row => {
+        const y = Math.floor((row.month - 1) / 12) + 1;
+        if (!yearly[y]) yearly[y] = { year:y, totalEmi:0, totalInterest:0, totalPrincipal:0, closing:0 };
+        yearly[y].totalEmi += row.emi;
+        yearly[y].totalInterest += row.interest;
+        yearly[y].totalPrincipal += row.principal;
+        yearly[y].closing = row.closing;
+    });
+    return Object.values(yearly);
+}
+
+function calculateMoratorium(principal, annualRate, courseMonths, graceMonths, tenureYears, treatment) {
+    const totalMora = courseMonths + graceMonths;
+    const monthlyRate = annualRate / 12 / 100;
+    let totalMoraInterest = 0, effectivePrincipal = principal, monthlyInterestPayment = null;
+    if (treatment === 'paid_during') {
+        monthlyInterestPayment = Math.round(principal * monthlyRate * 100) / 100;
+        totalMoraInterest = Math.round(monthlyInterestPayment * totalMora * 100) / 100;
+        effectivePrincipal = principal;
+    } else {
+        let bal = principal;
+        for (let i = 0; i < totalMora; i++) {
+            const mi = bal * monthlyRate;
+            totalMoraInterest += mi;
+            bal += mi;
+        }
+        totalMoraInterest = Math.round(totalMoraInterest * 100) / 100;
+        effectivePrincipal = Math.round(bal * 100) / 100;
+    }
+    const without = calculateEMI(principal, annualRate, tenureYears);
+    const withMora = calculateEMI(effectivePrincipal, annualRate, tenureYears);
+    const costWithout = without.total_payment;
+    const costWith = treatment === 'paid_during' ? withMora.total_payment + totalMoraInterest : withMora.total_payment;
+    return { principal, totalMoraMonths:totalMora, totalMoraInterest, effectivePrincipal, principalIncrease:Math.round((effectivePrincipal-principal)*100)/100, emiWithout:without.emi, emiWith:withMora.emi, emiIncrease:Math.round((withMora.emi-without.emi)*100)/100, costWithout, costWith:Math.round(costWith*100)/100, additionalCost:Math.round((costWith-costWithout)*100)/100, treatment, courseMonths, graceMonths };
+}
+
+// ══════════════════════════════════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════════════════════════════════
+const fmt = n => '₹' + Math.round(n).toLocaleString('en-IN');
+const fmtPct = n => (n * 100).toFixed(1) + '%';
+const APPLE_COLORS = ['#0066cc','#34c759','#ff9500','#ff3b30','#af52de','#5ac8fa','#ff6b6b','#ffcc02'];
+
+function metricCardHTML(label, value, cls='') {
+    return `<div class="metric-card ${cls}"><div class="metric-label">${label}</div><div class="metric-value${cls.includes('blue')?' blue':''}">${value}</div></div>`;
+}
+
+function buildTable(headers, rows) {
+    let html = '<table class="data-table"><thead><tr>' + headers.map(h=>`<th>${h}</th>`).join('') + '</tr></thead><tbody>';
+    rows.forEach(r => { html += '<tr>' + r.map(c=>`<td>${c}</td>`).join('') + '</tr>'; });
+    html += '</tbody></table>';
+    return html;
+}
+
+// ══════════════════════════════════════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════════════════════════════════════
+document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', () => {
+        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+        item.classList.add('active');
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById('page-' + item.dataset.page).classList.add('active');
+        document.querySelector('.sidebar').classList.remove('open');
+        window.scrollTo(0,0);
+        renderCurrentPage(item.dataset.page);
+    });
+});
+
+// Tab system
+document.querySelectorAll('.tab-bar').forEach(bar => {
+    bar.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            bar.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const tabGroup = bar.id.replace('-tabs','');
+            // Find sibling tab panels
+            let panel = bar.nextElementSibling;
+            while(panel && panel.classList.contains('tab-panel')) {
+                panel.classList.remove('active');
+                if (panel.id === btn.dataset.tab) panel.classList.add('active');
+                panel = panel.nextElementSibling;
+            }
+        });
+    });
+});
+
+// ══════════════════════════════════════════════════════════════════════
+// PAGE RENDERERS
+// ══════════════════════════════════════════════════════════════════════
+function renderCurrentPage(page) {
+    switch(page) {
+        case 'home': renderHome(); break;
+        case 'cost-estimator': renderCostEstimator(); break;
+        case 'loan-comparison': renderLoanComparison(); break;
+        case 'detailed-analysis': renderDetailedAnalysis(); break;
+        case 'scenario-simulator': renderScenarios(); break;
+        case 'sensitivity': renderSensitivity(); break;
+        case 'international': renderInternational(); break;
+        case 'destination-updates': renderDestinationUpdates(); break;
+        case 'about': renderAbout(); break;
+    }
+}
+
+// ── HOME ───────────────────────────────────────────────────────────
+function renderHome() {
+    const p = +document.getElementById('home-principal').value;
+    const r = +document.getElementById('home-rate').value;
+    const t = +document.getElementById('home-tenure').value;
+    const res = calculateEMI(p, r, t);
+    document.getElementById('home-metrics').innerHTML =
+        metricCardHTML('Monthly EMI', fmt(res.emi)) +
+        metricCardHTML('Total Interest', fmt(res.total_interest)) +
+        metricCardHTML('Total Repayment', fmt(res.total_payment)) +
+        metricCardHTML('Interest / Principal', fmtPct(res.interest_to_principal_ratio));
+
+    const features = [
+        ['🏦','Multi-Lender Comparison','Compare EMI, interest, and total cost across 8+ lenders side-by-side.'],
+        ['📊','Amortization Schedule','Month-by-month breakdown of how each EMI splits between interest and principal.'],
+        ['⏸️','Moratorium Simulator','Understand how the study/grace period affects your total borrowing cost.'],
+        ['💰','True Cost Analysis','See the complete financial outflow including fees, not just the interest rate.'],
+        ['🔄','Scenario Analysis','Compare different loan configurations to find what works for your budget.'],
+        ['📈','Sensitivity Analysis','Visualize how rate and tenure changes affect your repayment.'],
+        ['🌍','International Education','Currency conversion and exchange-rate impact for studying abroad.'],
+        ['📰','Destination Updates','Relevant education, visa, and work-permit information by country.']
+    ];
+    document.getElementById('home-features').innerHTML = features.map(([icon,title,desc]) =>
+        `<div class="feature-card"><div class="icon">${icon}</div><h4>${title}</h4><p>${desc}</p></div>`
+    ).join('');
+}
+['home-principal','home-rate','home-tenure'].forEach(id => {
+    document.getElementById(id).addEventListener('input', renderHome);
+});
+
+// ── COST ESTIMATOR ─────────────────────────────────────────────────
+function renderCostEstimator() {
+    const v = id => +document.getElementById(id).value;
+    const tuition=v('ce-tuition'), hostel=v('ce-hostel'), books=v('ce-books'),
+          living=v('ce-living'), travel=v('ce-travel'), other=v('ce-other'),
+          years=v('ce-years'), schol=v('ce-scholarship'), family=v('ce-family');
+    const annual = tuition+hostel+books+living+other;
+    const total = annual*years + travel;
+    const avail = schol + family;
+    const fin = Math.max(0, total - avail);
+
+    document.getElementById('ce-summary').innerHTML =
+        metricCardHTML('Annual Education Cost', fmt(annual)) +
+        metricCardHTML(`Total Education Cost (${years} years)`, fmt(total)) +
+        `<div class="metric-card"><div class="metric-label">Available Funds</div><div class="metric-value blue">${fmt(avail)}</div></div>` +
+        `<div class="metric-card accent"><div class="metric-label">Estimated Financing Required</div><div class="metric-value">${fmt(fin)}</div></div>`;
+
+    const cats = ['Tuition','Hostel / Accommodation','Books & Materials','Living Expenses','Other Expenses','Travel (Total)'];
+    const annuals = [tuition,hostel,books,living,other,travel];
+    const totals = [tuition*years,hostel*years,books*years,living*years,other*years,travel];
+    document.getElementById('ce-breakdown-table').innerHTML = buildTable(
+        ['Category','Annual (₹)',`Total (${years} yrs) (₹)`],
+        cats.map((c,i) => [c, fmt(annuals[i]), fmt(totals[i])])
+    );
+    document.getElementById('ce-next-step').innerHTML = `<div class="info-box">💡 <strong>Next step:</strong> Use the financing requirement of <strong>${fmt(fin)}</strong> in the <strong>Loan Comparison</strong> page to find suitable loan options.</div>`;
+}
+['ce-tuition','ce-hostel','ce-books','ce-living','ce-travel','ce-other','ce-years','ce-scholarship','ce-family'].forEach(id => {
+    document.getElementById(id).addEventListener('input', renderCostEstimator);
+});
+
+// ── LOAN COMPARISON ────────────────────────────────────────────────
+function renderLoanComparison() {
+    const amount = +document.getElementById('lc-amount').value;
+    const tenure = +document.getElementById('lc-tenure').value;
+    const rtype = document.querySelector('input[name="lc-rate-type"]:checked').value;
+
+    const results = LENDERS.map(l => {
+        const rate = rtype==='min'? l.interest_rate_min : rtype==='max'? l.interest_rate_max : (l.interest_rate_min+l.interest_rate_max)/2;
+        const r = calculateEMI(amount, rate, tenure);
+        return { ...l, usedRate:rate, ...r };
+    });
+
+    // Table
+    document.getElementById('lc-comparison-table').innerHTML = buildTable(
+        ['Lender','Rate (%)','Monthly EMI','Total Interest','Total Repayment'],
+        results.map(r => [r.lender_name, r.usedRate.toFixed(2)+'%', fmt(r.emi), fmt(r.total_interest), fmt(r.total_payment)])
+    );
+
+    // Chart
+    Plotly.newPlot('lc-chart', [{
+        x: results.map(r=>r.lender_name), y: results.map(r=>r.emi),
+        type: 'bar', marker: { color: APPLE_COLORS.slice(0, results.length), borderRadius: 6 },
+        text: results.map(r=>fmt(r.emi)), textposition: 'outside'
+    }], { title:{text:'Monthly EMI Comparison',font:{family:'SF Pro Display, Inter',size:18,color:'#1d1d1f'}}, plot_bgcolor:'#fff', paper_bgcolor:'#fff', xaxis:{tickangle:-30,color:'#1d1d1f',gridcolor:'#e0e0e0'}, yaxis:{title:'EMI (₹)',color:'#1d1d1f',gridcolor:'#e0e0e0'}, margin:{t:50,b:120}, font:{family:'SF Pro Text, Inter'} }, {responsive:true});
+
+    // Lender cards
+    document.getElementById('lc-lender-cards').innerHTML = results.map(r => `
+        <div class="lender-card">
+            <h4>${r.lender_name}</h4>
+            <div class="detail-row"><span class="detail-label">Loan Type</span><span class="detail-value">${r.loan_type}</span></div>
+            <div class="detail-row"><span class="detail-label">Rate Range</span><span class="detail-value">${r.interest_rate_min}% – ${r.interest_rate_max}%</span></div>
+            <div class="detail-row"><span class="detail-label">Monthly EMI</span><span class="detail-value">${fmt(r.emi)}</span></div>
+            <div class="detail-row"><span class="detail-label">Total Interest</span><span class="detail-value">${fmt(r.total_interest)}</span></div>
+            <div class="detail-row"><span class="detail-label">Max Loan</span><span class="detail-value">${r.max_loan_amount==='Not Available'?'Not Available':'₹'+Number(r.max_loan_amount).toLocaleString('en-IN')}</span></div>
+            <div class="detail-row"><span class="detail-label">Processing Fee</span><span class="detail-value">${r.processing_fee}</span></div>
+            <div class="detail-row"><span class="detail-label">Collateral</span><span class="detail-value">${r.collateral_required}</span></div>
+            <div class="detail-row"><span class="detail-label">Max Repayment</span><span class="detail-value">${r.repayment_period_max_years} years</span></div>
+            <a class="source-badge" href="${r.source_url}" target="_blank">📋 Source: ${r.source_url.split('/')[2]} • Verified ${r.last_verified}</a>
+        </div>
+    `).join('');
+}
+['lc-amount','lc-tenure'].forEach(id => document.getElementById(id).addEventListener('input', renderLoanComparison));
+document.querySelectorAll('input[name="lc-rate-type"]').forEach(r => r.addEventListener('change', renderLoanComparison));
+
+// ── DETAILED ANALYSIS ──────────────────────────────────────────────
+function renderDetailedAnalysis() {
+    const p = +document.getElementById('da-principal').value;
+    const r = +document.getElementById('da-rate').value;
+    const t = +document.getElementById('da-tenure').value;
+
+    // EMI Tab
+    const emi = calculateEMI(p, r, t);
+    document.getElementById('da-emi-metrics').innerHTML =
+        metricCardHTML('Monthly EMI', fmt(emi.emi)) +
+        metricCardHTML('Total Interest', fmt(emi.total_interest)) +
+        metricCardHTML('Total Repayment', fmt(emi.total_payment));
+    Plotly.newPlot('da-emi-chart', [{values:[p,emi.total_interest],labels:['Principal','Interest'],type:'pie',marker:{colors:['#0066cc','#ff9500']},hole:0.5,textinfo:'label+percent'}],{title:{text:'Cost Breakdown',font:{family:'SF Pro Display, Inter',size:18,color:'#1d1d1f'}},plot_bgcolor:'#fff',paper_bgcolor:'#fff',font:{family:'SF Pro Text, Inter'},margin:{t:50}},{responsive:true});
+
+    // Amortization Tab
+    const sched = generateAmortization(p, r, t);
+    const months = sched.map(s=>s.month);
+    Plotly.newPlot('da-amort-chart1',[{x:months,y:sched.map(s=>s.interest),name:'Interest',type:'bar',marker:{color:'#ff9500'}},{x:months,y:sched.map(s=>s.principal),name:'Principal',type:'bar',marker:{color:'#0066cc'}}],{barmode:'stack',title:{text:'Monthly EMI Split',font:{family:'SF Pro Display, Inter',size:16,color:'#1d1d1f'}},plot_bgcolor:'#fff',paper_bgcolor:'#fff',xaxis:{title:'Month',gridcolor:'#e0e0e0'},yaxis:{title:'Amount (₹)',gridcolor:'#e0e0e0'},font:{family:'SF Pro Text, Inter'},margin:{t:50}},{responsive:true});
+    Plotly.newPlot('da-amort-chart2',[{x:months,y:sched.map(s=>s.closing),type:'scatter',mode:'lines',fill:'tozeroy',line:{color:'#0066cc'},fillcolor:'rgba(0,102,204,0.1)'}],{title:{text:'Outstanding Principal',font:{family:'SF Pro Display, Inter',size:16,color:'#1d1d1f'}},plot_bgcolor:'#fff',paper_bgcolor:'#fff',xaxis:{title:'Month',gridcolor:'#e0e0e0'},yaxis:{title:'Balance (₹)',gridcolor:'#e0e0e0'},font:{family:'SF Pro Text, Inter'},margin:{t:50}},{responsive:true});
+
+    const yearly = getYearlySummary(sched);
+    document.getElementById('da-yearly-table').innerHTML = buildTable(
+        ['Year','Total EMI','Total Interest','Total Principal','Balance'],
+        yearly.map(y=>[y.year, fmt(y.totalEmi), fmt(y.totalInterest), fmt(y.totalPrincipal), fmt(y.closing)])
+    );
+    document.getElementById('da-monthly-table').innerHTML = buildTable(
+        ['Month','Opening Balance','EMI','Interest','Principal','Closing Balance'],
+        sched.map(s=>[s.month, fmt(s.opening), fmt(s.emi), fmt(s.interest), fmt(s.principal), fmt(s.closing)])
+    );
+
+    // Moratorium Tab
+    renderMoratorium(p, r, t);
+
+    // Total Cost Tab
+    renderTotalCost(p, r, t);
+}
+
+function renderMoratorium(p, r, t) {
+    const cm = +document.getElementById('da-mora-course').value;
+    const gm = +document.getElementById('da-mora-grace').value;
+    const treat = document.getElementById('da-mora-treatment').value;
+    if (cm + gm === 0) {
+        document.getElementById('da-mora-metrics').innerHTML = '<div class="info-box">Set a course duration or grace period above to see moratorium impact.</div>';
+        document.getElementById('da-mora-details').innerHTML = '';
+        return;
+    }
+    const m = calculateMoratorium(p, r, cm, gm, t, treat);
+
+    // Timeline chart
+    const phases = ['Course Period','Grace Period','Repayment Period'];
+    const durations = [cm, gm, t*12];
+    Plotly.newPlot('da-mora-chart',[{x:durations,y:phases,type:'bar',orientation:'h',marker:{color:['#ff9500','#ffcc02','#0066cc']},text:durations.map(d=>d+' months'),textposition:'auto'}],{title:{text:'Loan Timeline',font:{family:'SF Pro Display, Inter',size:16,color:'#1d1d1f'}},plot_bgcolor:'#fff',paper_bgcolor:'#fff',xaxis:{title:'Months',gridcolor:'#e0e0e0'},yaxis:{autorange:'reversed'},font:{family:'SF Pro Text, Inter'},margin:{l:130,t:50}},{responsive:true});
+
+    document.getElementById('da-mora-metrics').innerHTML =
+        metricCardHTML('EMI Without Moratorium', fmt(m.emiWithout)) +
+        metricCardHTML('EMI With Moratorium', fmt(m.emiWith)) +
+        metricCardHTML('Additional Cost', fmt(m.additionalCost));
+
+    let details = '<div class="grid grid-2" style="margin-top:20px;">';
+    details += `<div><strong>Before Moratorium:</strong><br>• Original Principal: ${fmt(p)}<br>• EMI: ${fmt(m.emiWithout)}<br>• Total Repayment: ${fmt(m.costWithout)}</div>`;
+    details += `<div><strong>After Moratorium:</strong><br>• Effective Principal: ${fmt(m.effectivePrincipal)}`;
+    if (m.principalIncrease > 0) details += `<br>• Principal Increase: ${fmt(m.principalIncrease)}`;
+    details += `<br>• Moratorium Interest: ${fmt(m.totalMoraInterest)}<br>• EMI: ${fmt(m.emiWith)}<br>• Total Cost: ${fmt(m.costWith)}</div></div>`;
+    if (treat === 'capitalized') {
+        details += `<div class="warning-box" style="margin-top:16px;">⚠️ With interest capitalization, accrued interest is added to your principal. Your effective principal increases from ${fmt(p)} to ${fmt(m.effectivePrincipal)}, resulting in higher EMIs.</div>`;
+    }
+    document.getElementById('da-mora-details').innerHTML = details;
+}
+
+function renderTotalCost(p, r, t) {
+    const procPct = +document.getElementById('da-proc-fee').value;
+    const docCharges = +document.getElementById('da-doc-charges').value;
+    const emi = calculateEMI(p, r, t);
+    const procFee = procPct > 0 ? Math.round(p * procPct / 100) : 0;
+    const totalKnown = emi.total_payment + procFee + docCharges;
+
+    document.getElementById('da-total-metrics').innerHTML =
+        metricCardHTML('Total EMI Payments', fmt(emi.total_payment)) +
+        metricCardHTML('Processing Fee', procPct > 0 ? fmt(procFee) : 'Not Available') +
+        metricCardHTML('Total Known Cost', fmt(totalKnown));
+
+    const components = {Principal:p, Interest:emi.total_interest};
+    if (procFee > 0) components['Processing Fee'] = procFee;
+    if (docCharges > 0) components['Documentation'] = docCharges;
+    const labels = Object.keys(components);
+    const vals = Object.values(components);
+    Plotly.newPlot('da-total-chart',[{values:vals,labels:labels,type:'pie',marker:{colors:APPLE_COLORS},hole:0.5,textinfo:'label+percent'}],{title:{text:'Total Cost Breakdown',font:{family:'SF Pro Display, Inter',size:18,color:'#1d1d1f'}},plot_bgcolor:'#fff',paper_bgcolor:'#fff',font:{family:'SF Pro Text, Inter'},margin:{t:50}},{responsive:true});
+}
+
+['da-principal','da-rate','da-tenure'].forEach(id => document.getElementById(id).addEventListener('input', () => renderDetailedAnalysis()));
+['da-mora-course','da-mora-grace','da-mora-treatment'].forEach(id => document.getElementById(id).addEventListener('input', () => {
+    const p=+document.getElementById('da-principal').value, r=+document.getElementById('da-rate').value, t=+document.getElementById('da-tenure').value;
+    renderMoratorium(p,r,t);
+}));
+['da-proc-fee','da-doc-charges'].forEach(id => document.getElementById(id).addEventListener('input', () => {
+    const p=+document.getElementById('da-principal').value, r=+document.getElementById('da-rate').value, t=+document.getElementById('da-tenure').value;
+    renderTotalCost(p,r,t);
+}));
+
+// ── SCENARIO SIMULATOR ─────────────────────────────────────────────
+function renderScenarios() {
+    const count = +document.getElementById('ss-count').value;
+    let inputsHTML = '';
+    for (let i = 0; i < count; i++) {
+        const ch = String.fromCharCode(65+i);
+        const defRate = 9 + i*0.5;
+        const defTenure = Math.max(1, 10 - i*3);
+        inputsHTML += `<div><h3>Scenario ${ch}</h3>
+            <div class="form-group"><label>Principal (₹)</label><input type="number" id="ss-p-${i}" value="1000000" min="10000" step="50000" oninput="updateScenarioResults()"></div>
+            <div class="form-group"><label>Rate (%)</label><input type="number" id="ss-r-${i}" value="${defRate}" min="0.1" step="0.25" oninput="updateScenarioResults()"></div>
+            <div class="form-group"><label>Tenure (yrs)</label><input type="number" id="ss-t-${i}" value="${defTenure}" min="1" step="1" oninput="updateScenarioResults()"></div>
+        </div>`;
+    }
+    document.getElementById('ss-inputs').innerHTML = inputsHTML;
+    document.getElementById('ss-inputs').style.gridTemplateColumns = `repeat(${count}, 1fr)`;
+    setTimeout(updateScenarioResults, 50);
+}
+
+function updateScenarioResults() {
+    const count = +document.getElementById('ss-count').value;
+    const scenarios = [];
+    for (let i = 0; i < count; i++) {
+        const pEl = document.getElementById(`ss-p-${i}`);
+        if (!pEl) return;
+        scenarios.push({
+            name: `Scenario ${String.fromCharCode(65+i)}`,
+            principal: +pEl.value,
+            rate: +document.getElementById(`ss-r-${i}`).value,
+            tenure: +document.getElementById(`ss-t-${i}`).value
+        });
+    }
+    const results = scenarios.map(s => ({ ...s, ...calculateEMI(s.principal, s.rate, s.tenure) }));
+
+    document.getElementById('ss-table').innerHTML = buildTable(
+        ['Scenario','Principal','Rate','Tenure','Monthly EMI','Total Interest','Total Repayment','Interest/Principal'],
+        results.map(r => [r.name, fmt(r.principal), r.rate.toFixed(2)+'%', r.tenure+' yrs', fmt(r.emi), fmt(r.total_interest), fmt(r.total_payment), fmtPct(r.interest_to_principal_ratio)])
+    );
+
+    Plotly.newPlot('ss-chart',[
+        {x:results.map(r=>r.name),y:results.map(r=>r.emi),name:'Monthly EMI',type:'bar',marker:{color:'#0066cc'}},
+        {x:results.map(r=>r.name),y:results.map(r=>r.total_interest),name:'Total Interest',type:'bar',marker:{color:'#ff9500'}},
+    ],{barmode:'group',title:{text:'Scenario Comparison',font:{family:'SF Pro Display, Inter',size:18,color:'#1d1d1f'}},plot_bgcolor:'#fff',paper_bgcolor:'#fff',xaxis:{color:'#1d1d1f'},yaxis:{title:'Amount (₹)',gridcolor:'#e0e0e0'},font:{family:'SF Pro Text, Inter'},margin:{t:50}},{responsive:true});
+
+    if (results.length >= 2) {
+        const emis = results.map(r=>r.emi), ints = results.map(r=>r.total_interest), reps = results.map(r=>r.total_payment);
+        const emiSpread = Math.max(...emis)-Math.min(...emis);
+        const intSpread = Math.max(...ints)-Math.min(...ints);
+        const repSpread = Math.max(...reps)-Math.min(...reps);
+        if (intSpread > 0) {
+            document.getElementById('ss-insight').innerHTML = `<div class="insight-card"><h4>Key Differences Across Scenarios</h4><p>EMI spread: ${fmt(emiSpread)}/month · Interest spread: ${fmt(intSpread)} · Repayment spread: ${fmt(repSpread)}</p></div>`;
+        }
+    }
+}
+
+// ── SENSITIVITY ANALYSIS ───────────────────────────────────────────
+function renderSensitivity() {
+    renderRateSensitivity();
+    renderTenureSensitivity();
+}
+
+function renderRateSensitivity() {
+    const p = +document.getElementById('sa-principal').value;
+    const t = +document.getElementById('sa-tenure-fixed').value;
+    const rMin = +document.getElementById('sa-rate-min').value;
+    const rMax = +document.getElementById('sa-rate-max').value;
+    const rows = [];
+    for (let rate = rMin; rate <= rMax + 0.001; rate += 0.5) {
+        const r = calculateEMI(p, Math.round(rate*100)/100, t);
+        rows.push({ rate: Math.round(rate*100)/100, ...r });
+    }
+    Plotly.newPlot('sa-rate-chart',[
+        {x:rows.map(r=>r.rate),y:rows.map(r=>r.emi),name:'Monthly EMI',yaxis:'y',type:'scatter',mode:'lines+markers',line:{color:'#0066cc'}},
+        {x:rows.map(r=>r.rate),y:rows.map(r=>r.total_interest),name:'Total Interest',yaxis:'y2',type:'scatter',mode:'lines+markers',line:{color:'#ff9500'}}
+    ],{title:{text:'Rate Sensitivity',font:{family:'SF Pro Display, Inter',size:18,color:'#1d1d1f'}},plot_bgcolor:'#fff',paper_bgcolor:'#fff',xaxis:{title:'Interest Rate (%)',gridcolor:'#e0e0e0'},yaxis:{title:'EMI (₹)',gridcolor:'#e0e0e0',side:'left'},yaxis2:{title:'Total Interest (₹)',overlaying:'y',side:'right',gridcolor:'#e0e0e0'},font:{family:'SF Pro Text, Inter'},margin:{t:50}},{responsive:true});
+
+    document.getElementById('sa-rate-table').innerHTML = buildTable(
+        ['Interest Rate (%)','Monthly EMI','Total Interest','Total Repayment'],
+        rows.map(r=>[r.rate+'%', fmt(r.emi), fmt(r.total_interest), fmt(r.total_payment)])
+    );
+}
+
+const tenureOptionsState = new Set([3,5,7,10,15]);
+function renderTenureSensitivity() {
+    const allOpts = [1,2,3,5,7,10,12,15,20];
+    document.getElementById('sa-tenure-options').innerHTML = allOpts.map(o =>
+        `<label style="font-size:14px; padding:6px 14px; border:1px solid ${tenureOptionsState.has(o)?'var(--primary)':'var(--hairline)'}; border-radius:9999px; cursor:pointer; background:${tenureOptionsState.has(o)?'var(--primary)':'var(--canvas)'}; color:${tenureOptionsState.has(o)?'#fff':'var(--ink)'}; transition:all 0.15s;" onclick="toggleTenureOpt(${o})">${o} yr${o>1?'s':''}</label>`
+    ).join('');
+
+    if (tenureOptionsState.size === 0) return;
+    const p = +document.getElementById('sa-principal').value;
+    const r = +document.getElementById('sa-rate').value;
+    const opts = [...tenureOptionsState].sort((a,b)=>a-b);
+    const rows = opts.map(y => ({ tenure:y, ...calculateEMI(p, r, y) }));
+    const maxInt = Math.max(...rows.map(r=>r.total_interest));
+
+    Plotly.newPlot('sa-tenure-chart',[
+        {x:rows.map(r=>r.tenure+' yrs'),y:rows.map(r=>r.emi),name:'Monthly EMI',type:'bar',marker:{color:'#0066cc'}},
+        {x:rows.map(r=>r.tenure+' yrs'),y:rows.map(r=>r.total_interest),name:'Total Interest',type:'bar',marker:{color:'#ff9500'}}
+    ],{barmode:'group',title:{text:'Tenure Sensitivity',font:{family:'SF Pro Display, Inter',size:18,color:'#1d1d1f'}},plot_bgcolor:'#fff',paper_bgcolor:'#fff',xaxis:{title:'Tenure'},yaxis:{title:'Amount (₹)',gridcolor:'#e0e0e0'},font:{family:'SF Pro Text, Inter'},margin:{t:50}},{responsive:true});
+
+    document.getElementById('sa-tenure-table').innerHTML = buildTable(
+        ['Tenure','Monthly EMI','Total Interest','Total Repayment','Interest Saved vs Max'],
+        rows.map(r=>[r.tenure+' yrs', fmt(r.emi), fmt(r.total_interest), fmt(r.total_payment), fmt(maxInt - r.total_interest)])
+    );
+}
+function toggleTenureOpt(val) {
+    if (tenureOptionsState.has(val)) tenureOptionsState.delete(val); else tenureOptionsState.add(val);
+    renderTenureSensitivity();
+}
+['sa-principal','sa-rate','sa-tenure-fixed','sa-rate-min','sa-rate-max'].forEach(id => {
+    document.getElementById(id).addEventListener('input', renderSensitivity);
+});
+
+// ── INTERNATIONAL EDUCATION ────────────────────────────────────────
+function renderInternational() {
+    const sel = document.getElementById('intl-country');
+    if (sel.options.length <= 1) {
+        Object.keys(COUNTRIES).forEach(c => { const o = document.createElement('option'); o.value = c; o.text = c; sel.add(o); });
+    }
+    const country = sel.value;
+    const info = COUNTRIES[country];
+    if (!info) return;
+
+    document.getElementById('intl-country-card').innerHTML = `
+        <div class="country-card">
+            <span class="flag">${info.flag_emoji}</span>
+            <h3>${country}</h3>
+            <p>${info.currency_code} (${info.currency_symbol}) · ${info.avg_tuition_range}</p>
+            <p class="courses">${info.popular_courses.join(', ')}</p>
+        </div>`;
+
+    document.getElementById('intl-amount-label').textContent = `Amount in ${info.currency_code}`;
+    document.getElementById('intl-rate-label').textContent = `Exchange Rate (${info.currency_code} → INR)`;
+    document.getElementById('intl-rate').value = info.default_exchange_rate_to_inr;
+    renderIntlConvert();
+    renderIntlSensitivity();
+}
+
+function renderIntlConvert() {
+    const country = document.getElementById('intl-country').value;
+    const info = COUNTRIES[country]; if (!info) return;
+    const amount = +document.getElementById('intl-amount').value;
+    const rate = +document.getElementById('intl-rate').value;
+    const converted = Math.round(amount * rate);
+    document.getElementById('intl-result').innerHTML = `
+        <div class="metric-card" style="margin-top:16px;">
+            <div class="metric-label">${info.currency_symbol}${amount.toLocaleString()} × ${rate} = ₹${converted.toLocaleString('en-IN')}</div>
+            <div class="metric-value">₹${converted.toLocaleString('en-IN')}</div>
+        </div>`;
+}
+
+function renderIntlSensitivity() {
+    const country = document.getElementById('intl-country').value;
+    const info = COUNTRIES[country]; if (!info) return;
+    const amount = +document.getElementById('intl-amount').value;
+    const baseRate = +document.getElementById('intl-rate').value;
+    const varPct = +document.getElementById('intl-var').value;
+    const steps = 5, stepSize = varPct / steps;
+    const data = [];
+    for (let i = -steps; i <= steps; i++) {
+        const pctChange = Math.round(i * stepSize * 10) / 10;
+        const rate = Math.round(baseRate * (1 + pctChange/100) * 100) / 100;
+        const converted = Math.round(amount * rate);
+        data.push({ pctChange, rate, converted });
+    }
+
+    Plotly.newPlot('intl-sens-chart',[{
+        x: data.map(d=>d.rate),
+        y: data.map(d=>d.converted),
+        type:'scatter', mode:'lines+markers',
+        line:{color:'#0066cc'}, fill:'tozeroy', fillcolor:'rgba(0,102,204,0.08)',
+        text: data.map(d=>`₹${d.converted.toLocaleString('en-IN')}`), textposition:'top'
+    }],{title:{text:'Exchange Rate Sensitivity',font:{family:'SF Pro Display, Inter',size:18,color:'#1d1d1f'}},plot_bgcolor:'#fff',paper_bgcolor:'#fff',xaxis:{title:`Exchange Rate (${info.currency_code} → INR)`,gridcolor:'#e0e0e0'},yaxis:{title:'INR Equivalent',gridcolor:'#e0e0e0'},font:{family:'SF Pro Text, Inter'},margin:{t:50}},{responsive:true});
+
+    document.getElementById('intl-sens-table').innerHTML = buildTable(
+        ['Rate Change (%)','Exchange Rate',`Foreign Amount (${info.currency_symbol})`,'INR Equivalent'],
+        data.map(d=>[d.pctChange.toFixed(1)+'%', d.rate, info.currency_symbol+amount.toLocaleString(), '₹'+d.converted.toLocaleString('en-IN')])
+    );
+}
+
+document.getElementById('intl-country').addEventListener('change', renderInternational);
+['intl-amount','intl-rate'].forEach(id => document.getElementById(id).addEventListener('input', () => { renderIntlConvert(); renderIntlSensitivity(); }));
+
+// ── DESTINATION UPDATES ────────────────────────────────────────────
+function renderDestinationUpdates() {
+    const countrySel = document.getElementById('du-country');
+    const catSel = document.getElementById('du-category');
+    if (countrySel.options.length <= 1) {
+        const countries = [...new Set(UPDATES.map(u=>u.country))].sort();
+        countries.forEach(c => { const o = document.createElement('option'); o.value=c; o.text=c; countrySel.add(o); });
+        const cats = [...new Set(UPDATES.map(u=>u.category))].sort();
+        cats.forEach(c => { const o = document.createElement('option'); o.value=c; o.text=c; catSel.add(o); });
+    }
+    const fc = countrySel.value;
+    const fcat = catSel.value;
+    let filtered = UPDATES;
+    if (fc !== 'All') filtered = filtered.filter(u=>u.country===fc);
+    if (fcat !== 'All') filtered = filtered.filter(u=>u.category===fcat);
+
+    document.getElementById('du-cards').innerHTML = filtered.length === 0
+        ? '<p style="color:var(--ink-muted-48);">No updates found for the selected filters.</p>'
+        : filtered.map(u => `
+        <div class="dest-card">
+            <div style="margin-bottom:10px;"><span class="badge">${u.country}</span><span class="badge">${u.category}</span></div>
+            <h4>${u.headline}</h4>
+            <p>${u.explanation}</p>
+            <div class="meta">${u.date} · ${u.source_name} · <a class="link" href="${u.source_url}" target="_blank">Read more →</a></div>
+        </div>
+    `).join('');
+}
+['du-country','du-category'].forEach(id => document.getElementById(id).addEventListener('change', renderDestinationUpdates));
+
+// ── ABOUT ──────────────────────────────────────────────────────────
+function renderAbout() {
+    document.getElementById('about-sources-table').innerHTML = buildTable(
+        ['Lender','Source URL','Last Verified','Notes'],
+        LENDERS.map(l => [l.lender_name, `<a href="${l.source_url}" target="_blank">${l.source_url.split('/')[2]}</a>`, l.last_verified, l.notes])
+    );
+}
+
+// ══════════════════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════════════════
+renderHome();
+
+// ══════════════════════════════════════════════════════════════════════
+// 💥 CHAOS MODE EASTER EGG — Konami Code: ↑↑↓↓←→←→BA  OR  triple-click logo
+// ══════════════════════════════════════════════════════════════════════
+(function() {
+  const KONAMI = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
+  let seq = [];
+
+  const SAVAGE_MSGS = [
+    "YOOOO WHY ARE YOU STILL COMPARING LOANS 💀",
+    "BRO JUST TAKE THE LOAN AND CRY LATER 😤",
+    "YOUR EMI IS GOING TO EAT YOUR LUNCH EVERY DAY 🍱",
+    "INTEREST RATES DON'T CARE ABOUT YOUR FEELINGS 🔥",
+    "MAMA SAID KNOCK YOU OUT 👊",
+    "YOU THOUGHT THIS WAS A SERIOUS APP?? THINK AGAIN 😈",
+    "COMPOUND INTEREST IS JUST CAPITALISM YELLING AT YOU 📢",
+    "SIR THIS IS A WENDY'S 🍔",
+    "YOUR BANK ACCOUNT IS CRYING RN 😭💸",
+    "F*** IT WE BALL 🏀",
+  ];
+
+  const EMOJIS = ['💸','🔥','💀','😤','🤑','💣','⚡','🎰','😱','🤯','💥','🚀','😈','🎉','💯'];
+
+  // ── inject styles ──────────────────────────────────────────────────
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes chaos-shake {
+      0%,100%{transform:translate(0,0) rotate(0deg)}
+      10%{transform:translate(-8px,6px) rotate(-2deg)}
+      20%{transform:translate(8px,-6px) rotate(2deg)}
+      30%{transform:translate(-6px,8px) rotate(-1deg)}
+      40%{transform:translate(6px,-8px) rotate(3deg)}
+      50%{transform:translate(-10px,4px) rotate(-3deg)}
+      60%{transform:translate(10px,4px) rotate(2deg)}
+      70%{transform:translate(-4px,-10px) rotate(-2deg)}
+      80%{transform:translate(4px,10px) rotate(1deg)}
+      90%{transform:translate(-8px,-4px) rotate(-1deg)}
+    }
+    @keyframes chaos-flash {
+      0%{background:#ff0080}5%{background:#ff6600}10%{background:#ffff00}
+      15%{background:#00ff00}20%{background:#00ffff}25%{background:#0080ff}
+      30%{background:#8000ff}35%{background:#ff0080}40%{background:#ff0000}
+      45%{background:#ff6600}50%{background:#00ff80}55%{background:#ff00ff}
+      60%{background:#ffff00}65%{background:#00ffff}70%{background:#ff0040}
+      75%{background:#40ff00}80%{background:#0040ff}85%{background:#ff4000}
+      90%{background:#00ff40}95%{background:#4000ff}100%{background:#ff0080}
+    }
+    @keyframes chaos-text {
+      0%,100%{transform:scale(1) rotate(0deg);color:#fff}
+      25%{transform:scale(1.3) rotate(-5deg);color:#ffff00}
+      50%{transform:scale(0.8) rotate(5deg);color:#ff00ff}
+      75%{transform:scale(1.2) rotate(-3deg);color:#00ffff}
+    }
+    @keyframes emoji-fly {
+      0%{transform:translateY(100vh) rotate(0deg);opacity:1}
+      100%{transform:translateY(-120vh) rotate(720deg);opacity:0}
+    }
+    @keyframes chaos-border {
+      0%{box-shadow:0 0 40px #ff0080,inset 0 0 40px rgba(255,0,128,0.3)}
+      33%{box-shadow:0 0 40px #00ffff,inset 0 0 40px rgba(0,255,255,0.3)}
+      66%{box-shadow:0 0 40px #ffff00,inset 0 0 40px rgba(255,255,0,0.3)}
+      100%{box-shadow:0 0 40px #ff0080,inset 0 0 40px rgba(255,0,128,0.3)}
+    }
+    @keyframes mama-entrance {
+      0%{transform:scale(0) rotate(-30deg);opacity:0}
+      60%{transform:scale(1.15) rotate(5deg);opacity:1}
+      80%{transform:scale(0.95) rotate(-2deg)}
+      100%{transform:scale(1) rotate(0deg);opacity:1}
+    }
+    @keyframes pulse-glow {
+      0%,100%{text-shadow:0 0 20px #ff0080,0 0 40px #ff0080}
+      50%{text-shadow:0 0 40px #ffff00,0 0 80px #ffff00,0 0 120px #ff00ff}
+    }
+    @keyframes spin-out {
+      to{transform:rotate(360deg) scale(0);opacity:0}
+    }
+
+    #chaos-overlay {
+      position:fixed;inset:0;z-index:99999;
+      display:flex;flex-direction:column;
+      align-items:center;justify-content:center;
+      animation:chaos-flash 0.3s infinite;
+      cursor:pointer;
+    }
+    #chaos-overlay.chaos-shake {
+      animation:chaos-flash 0.3s infinite, chaos-shake 0.15s infinite;
+    }
+    #chaos-card {
+      background:rgba(0,0,0,0.85);
+      border-radius:24px;
+      padding:48px 56px;
+      text-align:center;
+      animation:mama-entrance 0.6s cubic-bezier(0.34,1.56,0.64,1) forwards,
+                 chaos-border 1s infinite;
+      max-width:640px;
+      position:relative;
+      z-index:2;
+    }
+    #chaos-big-text {
+      font-size:clamp(36px,6vw,72px);
+      font-weight:900;
+      letter-spacing:-1px;
+      animation:chaos-text 0.5s infinite;
+      line-height:1.1;
+      margin-bottom:20px;
+    }
+    #chaos-sub {
+      font-size:clamp(16px,2.5vw,22px);
+      color:#ccc;
+      margin-bottom:32px;
+      animation:pulse-glow 1s infinite;
+      font-weight:600;
+    }
+    #chaos-msg {
+      font-size:clamp(14px,2vw,18px);
+      color:#aaa;
+      margin-bottom:32px;
+      font-style:italic;
+      min-height:32px;
+    }
+    #chaos-close {
+      background:linear-gradient(135deg,#ff0080,#ff6600);
+      color:#fff;
+      border:none;
+      padding:14px 36px;
+      border-radius:50px;
+      font-size:18px;
+      font-weight:700;
+      cursor:pointer;
+      letter-spacing:1px;
+      transition:transform 0.1s;
+    }
+    #chaos-close:hover{transform:scale(1.08)}
+    #chaos-close:active{transform:scale(0.95)}
+    .chaos-emoji-particle {
+      position:fixed;
+      font-size:clamp(24px,4vw,48px);
+      pointer-events:none;
+      z-index:99998;
+      animation:emoji-fly linear forwards;
+    }
+    #chaos-hint {
+      position:fixed;bottom:20px;right:20px;
+      font-size:11px;color:rgba(200,200,200,0.25);
+      z-index:100;cursor:default;
+      letter-spacing:1px;
+      user-select:none;
+    }
+  `;
+  document.head.appendChild(style);
+
+  // ── hint text (barely visible) ─────────────────────────────────────
+  const hint = document.createElement('div');
+  hint.id = 'chaos-hint';
+  hint.textContent = '↑↑↓↓←→←→BA';
+  document.body.appendChild(hint);
+
+  // ── build overlay ──────────────────────────────────────────────────
+  const overlay = document.createElement('div');
+  overlay.id = 'chaos-overlay';
+  overlay.innerHTML = `
+    <div id="chaos-card">
+      <div id="chaos-big-text">💥 CHAOS MODE 💥</div>
+      <div id="chaos-sub">YOU HAVE UNLOCKED THE FORBIDDEN ZONE</div>
+      <div id="chaos-msg"></div>
+      <button id="chaos-close">GET ME OUT OF HERE 🚪</button>
+    </div>
+  `;
+  overlay.style.display = 'none';
+  document.body.appendChild(overlay);
+
+  // ── emoji particle spawner ─────────────────────────────────────────
+  let emojiInterval;
+  function spawnEmoji() {
+    const el = document.createElement('div');
+    el.className = 'chaos-emoji-particle';
+    el.textContent = EMOJIS[Math.floor(Math.random() * EMOJIS.length)];
+    el.style.left = (Math.random() * 100) + 'vw';
+    el.style.bottom = '-60px';
+    const dur = (1.5 + Math.random() * 2).toFixed(2) + 's';
+    el.style.animationDuration = dur;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), parseFloat(dur) * 1000 + 200);
+  }
+
+  // ── rotating savage messages ────────────────────────────────────────
+  let msgInterval, msgIdx = 0;
+  function rotateMsgs() {
+    const el = document.getElementById('chaos-msg');
+    if (el) el.textContent = '"' + SAVAGE_MSGS[msgIdx % SAVAGE_MSGS.length] + '"';
+    msgIdx++;
+  }
+
+  // ── activate chaos ─────────────────────────────────────────────────
+  function activateChaos() {
+    overlay.style.display = 'flex';
+    overlay.classList.add('chaos-shake');
+    msgIdx = 0;
+    rotateMsgs();
+    emojiInterval = setInterval(spawnEmoji, 120);
+    msgInterval  = setInterval(rotateMsgs, 1500);
+    // screen shake on the body too
+    document.body.style.animation = 'chaos-shake 0.15s infinite';
+  }
+
+  // ── deactivate chaos ───────────────────────────────────────────────
+  function deactivateChaos() {
+    overlay.style.display = 'none';
+    overlay.classList.remove('chaos-shake');
+    clearInterval(emojiInterval);
+    clearInterval(msgInterval);
+    document.body.style.animation = '';
+    // remove any stray emoji particles
+    document.querySelectorAll('.chaos-emoji-particle').forEach(e => e.remove());
+  }
+
+  document.getElementById('chaos-close').addEventListener('click', deactivateChaos);
+
+  // ── Konami Code listener ───────────────────────────────────────────
+  document.addEventListener('keydown', e => {
+    seq.push(e.key);
+    if (seq.length > KONAMI.length) seq.shift();
+    if (seq.join(',') === KONAMI.join(',')) {
+      seq = [];
+      activateChaos();
+    }
+  });
+
+  // ── Triple-click on logo/title also triggers it ────────────────────
+  let clickCount = 0, clickTimer;
+  document.addEventListener('click', e => {
+    const target = e.target;
+    const isLogo = target.closest('.sidebar-logo') || target.closest('h1') || target.closest('.logo');
+    if (!isLogo) return;
+    clickCount++;
+    clearTimeout(clickTimer);
+    clickTimer = setTimeout(() => { clickCount = 0; }, 600);
+    if (clickCount >= 3) {
+      clickCount = 0;
+      activateChaos();
+    }
+  });
+})();
+</script>
+</body>
+</html>
